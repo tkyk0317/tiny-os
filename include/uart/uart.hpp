@@ -11,7 +11,7 @@ public:
     ~UART();
 
     // 文字列送信
-    void send(const char* const);
+    void send(const char* const) const;
 
 private:
     // 各種レジスタ定義
@@ -26,5 +26,5 @@ private:
     };
 
     // 文字送信
-    void sendChar(char);
+    void sendChar(const char) const;
 };
