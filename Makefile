@@ -1,6 +1,6 @@
 .PHONY: all clean start stop
 all:
-	@ cd build; make -s
+	@ mkdir -p build; cd build; cmake ..; make -s
 
 clean:
 	@ cd build; make -s clean
