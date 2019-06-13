@@ -1,22 +1,32 @@
 #include "uart/uart.hpp"
 
+void init();
+
 /**
- * エントリーポイント
- *
- * UARTの初期化処理をコンストラクタで実施している。
- * デバイス関連のシングルトン実装が必要であるが、stdlibなどをリンクしていないので、排他制御処理部分でエラーが発生する。
- * 対応を取る必要がある(https://postd.cc/embedded-cpp/)
+ * EntryPoint
  */
-extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags) {
+extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
+{
     // declare as unused
     (void) r0;
     (void) r1;
     (void) atags;
 
-    UART uart;
+    // initialize
+    init();
+
+    // send message
     auto msg = "start tiny os\n";
-    uart.send(msg);
+    UART::send(msg);
     while(1);
+}
+
+/**
+ * Initialize Function
+ */
+void init()
+{
+    UART::init();
 }
 
 // gcc定義関数

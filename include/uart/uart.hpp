@@ -2,23 +2,25 @@
 
 #include <stdint.h>
 
-
 /**
  * UARTクラス
  */
 class UART {
 public:
-    // 文字列送信
-    void send(const char* const) const;
+    // 初期化処理
+    static void init();
 
-    // コンストラクタ、デストラクタ
-    UART();
-    ~UART();
+    // 文字列送信
+    static void send(const char* const);
+
+    UART() = delete ;
+    ~UART() = delete;
     UART(const UART&) = delete;
     UART& operator=(const UART&) = delete;
     UART(UART&&) = delete;
     UART& operator=(UART&&) = delete;
+
 private:
     // 文字送信
-    void sendChar(const char) const;
+    static void sendChar(const char);
 };

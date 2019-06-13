@@ -4,14 +4,14 @@
 #include "cpu/cpu.hpp"
 
 /**
- * コンストラクタ
+ * 初期化処理
  *
  * UART0の初期化を行う
  *
  * p.175: https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
  * https://wiki.osdev.org/ARM_RaspberryPi_Tutorial_C
  */
-UART::UART()
+void UART::init()
 {
     // UART0無効化
     MMIO::write(static_cast<uint32_t>(UART0::CR), 0x00000000);
@@ -66,15 +66,9 @@ UART::UART()
 }
 
 /**
- * デストラクタ
- */
-UART::~UART()
-{}
-
-/**
  * 文字列送信
  */
-void UART::sendChar(const char c) const
+void UART::sendChar(const char c)
 {
     while (MMIO::read(static_cast<uint32_t>(UART0::FR)) & (1 << 5));
     MMIO::write(static_cast<uint32_t>(UART0::DR), c);
@@ -83,7 +77,7 @@ void UART::sendChar(const char c) const
 /**
  * 文字列送信
  */
-void UART::send(const char* const str) const
+void UART::send(const char* const str)
 {
     uint32_t i = 0;
     while(str[i] != 0) sendChar(static_cast<char>(str[i++]));
