@@ -2,6 +2,10 @@
 
 /**
  * エントリーポイント
+ *
+ * UARTの初期化処理をコンストラクタで実施している。
+ * デバイス関連のシングルトン実装が必要であるが、stdlibなどをリンクしていないので、排他制御処理部分でエラーが発生する。
+ * 対応を取る必要がある(https://postd.cc/embedded-cpp/)
  */
 extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags) {
     // declare as unused
@@ -10,7 +14,8 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags) {
     (void) atags;
 
     UART uart;
-    uart.send("start tiny os\n");
+    auto msg = "start tiny os\n";
+    uart.send(msg);
     while(1);
 }
 
