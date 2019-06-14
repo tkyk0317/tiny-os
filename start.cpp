@@ -1,17 +1,32 @@
 #include "uart/uart.hpp"
 
+void init();
+
 /**
- * エントリーポイント
+ * EntryPoint
  */
-extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags) {
+extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
+{
     // declare as unused
     (void) r0;
     (void) r1;
     (void) atags;
 
-    UART uart;
-    uart.send("start tiny os\n");
+    // initialize
+    init();
+
+    // send message
+    auto msg = "start tiny os\n";
+    UART::send(msg);
     while(1);
+}
+
+/**
+ * Initialize Function
+ */
+void init()
+{
+    UART::init();
 }
 
 // gcc定義関数
