@@ -82,3 +82,13 @@ void UART::send(const char* const str)
     uint32_t i = 0;
     while(str[i] != 0) sendChar(static_cast<char>(str[i++]));
 }
+
+/**
+ * 受信処理
+ */
+uint32_t UART::receive()
+{
+    // データ受信待ち
+    while (MMIO::read(static_cast<uint32_t>(UART0::FR)) & (1 << 4));
+    return MMIO::read(static_cast<uint32_t>(UART0::DR));
+}

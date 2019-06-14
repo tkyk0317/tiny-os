@@ -1,6 +1,7 @@
 #include "uart/uart.hpp"
 
 void init();
+void shell();
 
 /**
  * EntryPoint
@@ -8,9 +9,7 @@ void init();
 extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
 {
     // declare as unused
-    (void) r0;
-    (void) r1;
-    (void) atags;
+    (void) r0; (void) r1; (void) atags;
 
     // initialize
     init();
@@ -18,7 +17,9 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
     // send message
     auto msg = "start tiny os\n";
     UART::send(msg);
-    while(1);
+
+    // exec shell
+    shell();
 }
 
 /**
@@ -27,6 +28,18 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
 void init()
 {
     UART::init();
+}
+
+/**
+ * start shell
+ */
+void shell()
+{
+    while(true) {
+        uint32_t c = UART::receive();
+        if (c == 0xD) c = '\n';
+        UART::sendChar(static_cast<char>(c));
+    }
 }
 
 // gcc定義関数

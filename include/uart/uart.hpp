@@ -13,14 +13,16 @@ public:
     // 文字列送信
     static void send(const char* const);
 
+    // 文字送信
+    static void sendChar(const char);
+
+    // UARTからの受信
+    static uint32_t receive();
+
     UART() = delete ;
     ~UART() = delete;
     UART(const UART&) = delete;
     UART& operator=(const UART&) = delete;
     UART(UART&&) = delete;
     UART& operator=(UART&&) = delete;
-
-private:
-    // 文字送信
-    static void sendChar(const char);
 };
