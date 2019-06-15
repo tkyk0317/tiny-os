@@ -33,11 +33,14 @@ include_directories(./include)
 # target files
 add_executable(tiny-os
     boot.s
+    vector.s
     start.cpp
+    handler.cpp
 )
 
 # sub directories
 add_subdirectory(uart)
+add_subdirectory(interrupts)
 
 # link library
-target_link_libraries(tiny-os uart)
+target_link_libraries(tiny-os uart interrupts)

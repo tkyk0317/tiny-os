@@ -56,8 +56,11 @@ void UART::init()
     // 8bit目: パリティエラー割り込み
     // 9bit目: Breakエラー割り込み
     // 10bit目: オーバーランエラー割り込み
-    MMIO::write(static_cast<uint32_t>(UART0::IMSC), (1 << 1) | (1 << 4) | (1 << 5) | (1 << 6) |
-            (1 << 7) | (1 << 8) | (1 << 9) | (1 << 10));
+    MMIO::write(
+        static_cast<uint32_t>(UART0::IMSC),
+        static_cast<uint32_t>(UART_MIS::RXMIS) // 受信割り込みのみ
+        //(1 << 1) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9) | (1 << 10)
+    );
 
     // 0bit目: UARTを有効に
     // 8bit目: 送信を有効に

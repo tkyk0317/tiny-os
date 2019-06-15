@@ -1,7 +1,28 @@
 #include "uart/uart.hpp"
+#include "mmio/mmio.hpp"
+#include "register/regs.hpp"
 
-void init();
-void shell();
+extern "C" void enable_irq();
+extern "C" void* _Unwind_Resume() { return 0; }
+extern "C" void* __gxx_personality_v0() { return 0; }
+
+/**
+ * Initialize Function
+ */
+void init()
+{
+    // UART割り込み有効
+    MMIO::write(static_cast<uint32_t>(IRQ::ENABLE2), static_cast<uint32_t>(IRQ_ENABLE2::UART));
+
+    // Core0につなぐ
+    MMIO::write(static_cast<uint32_t>(GPU::INTERRUPTS_ROUTING), 0x0);
+
+    // UART初期化
+    UART::init();
+
+    // enable irq
+    enable_irq();
+}
 
 /**
  * EntryPoint
@@ -15,33 +36,10 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
     init();
 
     // send message
-    auto msg = "start tiny os\n";
-    UART::send(msg);
+    UART::send("******************************************\n");
+    UART::send("Start Tiny OS\n");
+    UART::send("******************************************\n");
 
     // exec shell
-    shell();
+    while(1) asm("wfi");
 }
-
-/**
- * Initialize Function
- */
-void init()
-{
-    UART::init();
-}
-
-/**
- * start shell
- */
-void shell()
-{
-    while(true) {
-        uint32_t c = UART::receive();
-        if (c == 0xD) c = '\n';
-        UART::sendChar(static_cast<char>(c));
-    }
-}
-
-// gcc定義関数
-extern "C" void* _Unwind_Resume() { return 0; }
-extern "C" void* __gxx_personality_v0() { return 0; }

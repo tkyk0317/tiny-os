@@ -10,6 +10,7 @@ SECTIONS
     .text :
     {
         KEEP(*(.boot))
+        KEEP(*(.vector))
         *(.text)
     }
     . = ALIGN(4096); /* aign to page size */
