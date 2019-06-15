@@ -1,8 +1,8 @@
 #include <stdlib.h>
-#include "uart/uart.hpp"
-#include "mmio/mmio.hpp"
-#include "register/regs.hpp"
-#include "interrupts/uart.hpp"
+#include "devices/uart/uart.hpp"
+#include "devices/mmio/mmio.hpp"
+#include "devices/register/regs.hpp"
+#include "devices/interrupts/uart.hpp"
 
 extern "C" void enable_irq();
 extern "C" void disable_irq();

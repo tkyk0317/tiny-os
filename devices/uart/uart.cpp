@@ -1,6 +1,6 @@
-#include "mmio/mmio.hpp"
-#include "uart/uart.hpp"
-#include "register/regs.hpp"
+#include "devices/mmio/mmio.hpp"
+#include "devices/uart/uart.hpp"
+#include "devices/register/regs.hpp"
 #include "cpu/cpu.hpp"
 
 /**

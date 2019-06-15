@@ -39,8 +39,7 @@ add_executable(tiny-os
 )
 
 # sub directories
-add_subdirectory(uart)
-add_subdirectory(interrupts)
+add_subdirectory(devices)
 
 # link library
 target_link_libraries(tiny-os uart interrupts)

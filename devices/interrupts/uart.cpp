@@ -1,7 +1,7 @@
-#include "mmio/mmio.hpp"
-#include "register/regs.hpp"
-#include "uart/uart.hpp"
-#include "interrupts/uart.hpp"
+#include "devices/mmio/mmio.hpp"
+#include "devices/register/regs.hpp"
+#include "devices/uart/uart.hpp"
+#include "devices/interrupts/uart.hpp"
 
 /**
  * UART割り込みハンドラ

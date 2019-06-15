@@ -1,6 +1,6 @@
-#include "uart/uart.hpp"
-#include "mmio/mmio.hpp"
-#include "register/regs.hpp"
+#include "devices/uart/uart.hpp"
+#include "devices/register/regs.hpp"
+#include "devices/mmio/mmio.hpp"
 
 extern "C" void enable_irq();
 extern "C" void* _Unwind_Resume() { return 0; }
