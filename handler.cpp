@@ -15,9 +15,9 @@ extern "C" void disable_irq();
 extern "C" void __irq_handler()
 {
     // UART0の受信割り込みチェック
-    if (MMIO::read(static_cast<uint32_t>(CORE0::INTERRUPT_SOURCE)) & static_cast<uint32_t>(CORE0_IRQ::GPU_INTERRUPT)) {
-        if (MMIO::read(static_cast<uint32_t>(IRQ::BASIC)) & static_cast<uint32_t>(IRQ_BASIC::PENDING2)) {
-            if (MMIO::read(static_cast<uint32_t>(IRQ::PEND2)) & static_cast<uint32_t>(IRQ_PENDING2::UART)) {
+    if (MMIO::read(CORE0_INTERRUPT_SOURCE) & CORE0_IRQ_GPU_INTERRUPT) {
+        if (MMIO::read(IRQ_BASIC) & IRQ_BASIC_PENDING2) {
+            if (MMIO::read(IRQ_PEND2) & IRQ_PENDING2_UART) {
                 disable_irq();
                 UART_Interrupt::handler();
                 enable_irq();

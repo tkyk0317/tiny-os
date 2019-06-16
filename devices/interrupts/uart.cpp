@@ -10,7 +10,7 @@ void UART_Interrupt::handler()
 {
     // 各割り込みに応じた関数をコール
     UART_Interrupt uart;
-    if (MMIO::read(static_cast<uint32_t>(UART0::MIS)) & static_cast<uint32_t>(UART_MIS::RXMIS)) uart.receive();
+    if (MMIO::read(UART0_MIS) & UART_MIS_RXMIS) uart.receive();
 }
 
 /**

@@ -12,10 +12,10 @@ extern "C" void* __gxx_personality_v0() { return 0; }
 void init()
 {
     // UART割り込み有効
-    MMIO::write(static_cast<uint32_t>(IRQ::ENABLE2), static_cast<uint32_t>(IRQ_ENABLE2::UART));
+    MMIO::write(IRQ_ENABLE2, IRQ_ENABLE2_UART);
 
     // Core0につなぐ
-    MMIO::write(static_cast<uint32_t>(GPU::INTERRUPTS_ROUTING), 0x0);
+    MMIO::write(GPU_INTERRUPTS_ROUTING, 0x0);
 
     // UART初期化
     UART::init();
