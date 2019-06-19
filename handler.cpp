@@ -14,16 +14,16 @@ extern "C" void disable_irq();
  */
 extern "C" void __irq_handler()
 {
-    // UART0の受信割り込みチェック
     if (MMIO::read(CORE0_INTERRUPT_SOURCE) & CORE0_IRQ_GPU_INTERRUPT) {
+        // UART0の受信割り込みチェック
         if (MMIO::read(IRQ_BASIC) & IRQ_BASIC_PENDING2) {
             if (MMIO::read(IRQ_PEND2) & IRQ_PENDING2_UART) {
-                disable_irq();
+                // UART割り込みを無効化し、処理。その後、有効化
+                MMIO::write(IRQ_DISABLE2, IRQ_DISABLE2_UART);
                 UART_Interrupt::handler();
-                enable_irq();
+                MMIO::write(IRQ_ENABLE2, IRQ_ENABLE2_UART);
             }
         }
-   }
-    return;
+    }
 }
 

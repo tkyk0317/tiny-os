@@ -16,6 +16,9 @@ public:
     // 文字送信
     static void sendChar(const char);
 
+    // 16進表示
+    static void sendHex(uint64_t);
+
     // UARTからの受信
     static uint32_t receive();
 

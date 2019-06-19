@@ -56,6 +56,10 @@ const uint32_t IRQ_BASIC_PENDING2 = 1 << 9; // PENDING2割り込み
 // IRQ Enable2
 const uint32_t IRQ_ENABLE2_UART = 1 << 25; // UART割り込み
 
+// IRQ Disable2
+const uint32_t IRQ_DISABLE2_UART = 1 << 25; // UART割り込み
+
+// IRQ Pending2
 const uint32_t IRQ_PENDING2_UART = 1 << 25; // UART割り込み
 
 // UART MIS

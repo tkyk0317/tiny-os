@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "devices/mmio/mmio.hpp"
 #include "devices/uart/uart.hpp"
 #include "devices/register/regs.hpp"
@@ -91,4 +92,13 @@ uint32_t UART::receive()
     // データ受信待ち
     while (MMIO::read(UART0_FR) & (1 << 4));
     return MMIO::read(UART0_DR);
+}
+
+/**
+ * HEX出力
+ */
+void UART::sendHex(uint64_t n)
+{
+    const char *hexdigits = "0123456789ABCDEF";
+    for (int i = 60; i >= 0; i -= 4) sendChar(hexdigits[(n >> i) & 0xf]);
 }

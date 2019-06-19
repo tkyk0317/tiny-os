@@ -8,7 +8,7 @@ _boot:
     cmp   x1, #0
     bne   hang
     // set stack pointer
-    ldr   x1, =_boot
+    ldr   x1, =0x00080000
     // drop to EL2.
     mov   x2, #0x5b1    // RW=1, HCE=1, SMD=1, RES=1, NS=1
     msr   scr_el3, x2
@@ -20,7 +20,10 @@ _boot:
 
 start_el2:
     // set sp in EL1.
+    ldr   x1, =0x70000
     msr   sp_el1, x1
+    ldr x1, =0x80000
+
     // enable AArch64 in EL1.
     mov   x0, #(1 << 31)      // AArch64
     orr   x0, x0, #(1 << 1)   // SWIO hardwired on Pi3
