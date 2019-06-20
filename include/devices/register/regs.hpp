@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdlib.h>
+#include <stdint.h>
 
 // GPU割り込み関連レジスタ
 const uint32_t GPU_INTERRUPTS_ROUTING = 0x4000000C;
@@ -32,6 +32,7 @@ const uint32_t UART0_ITOP   = (UART0_BASE + 0x88);
 const uint32_t UART0_TDR    = (UART0_BASE + 0x8C);
 
 // CORE0関連レジスタ
+const uint32_t CORE0_TIMER_INTERRUPT_CTL = 0x40000040;
 const uint32_t CORE0_INTERRUPT_SOURCE = 0x40000060;
 
 // IRQ関連レジスタ
@@ -48,7 +49,11 @@ const uint32_t IRQ_DISABLE2      = IRQ_BASE + 0x20;
 const uint32_t IRQ_DISABLE_BASIC = IRQ_BASE + 0x24;
 
 // CORE0 IRQ
+const uint32_t CORE0_IRQ_TIMER_INTERRUPT = 1 << 3; // IRQタイマー割り込み
 const uint32_t CORE0_IRQ_GPU_INTERRUPT = 1 << 8; // GPU割り込み
+
+// CORE0 Timer Interrupt
+const uint32_t CORE0_TIMER_IRQ_ENABLE = 1 << 3; // IRQタイマー割り込み
 
 // IRQ Basic
 const uint32_t IRQ_BASIC_PENDING2 = 1 << 9; // PENDING2割り込み

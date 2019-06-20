@@ -1,7 +1,7 @@
 /**
  * UART関連割り込みクラス
  */
-class UART_Interrupt
+class UARTInterrupt
 {
 public:
     // 割り込みハンドラ

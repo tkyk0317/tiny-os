@@ -16,9 +16,21 @@ vector:
     stp   x14, x15, [sp, #-16]!
     stp   x16, x17, [sp, #-16]!
     stp   x18, x19, [sp, #-16]!
+    stp   x20, x21, [sp, #-16]!
+    stp   x22, x23, [sp, #-16]!
+    stp   x24, x25, [sp, #-16]!
+    stp   x26, x27, [sp, #-16]!
+    stp   x28, x29, [sp, #-16]!
+    stp   x30, xzr, [sp, #-16]!
 
     bl    __irq_handler
 
+    ldp   x30, xzr, [sp], #16
+    ldp   x28, x29, [sp], #16
+    ldp   x26, x27, [sp], #16
+    ldp   x24, x25, [sp], #16
+    ldp   x22, x23, [sp], #16
+    ldp   x20, x21, [sp], #16
     ldp   x18, x19, [sp], #16
     ldp   x16, x17, [sp], #16
     ldp   x14, x15, [sp], #16
