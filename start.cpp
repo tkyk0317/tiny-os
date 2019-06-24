@@ -12,8 +12,11 @@ void* dummy_task1(void* args)
 {
     (void) args;
     while(1) {
-        //UART::send("dummy task1 \n");
-        asm volatile("wfi");
+        UART::send("dummy task1-1 \n");
+        UART::send("dummy task1-2 \n");
+        UART::send("dummy task1-3 \n");
+        do_switch();
+        UART::send("dummy task1-4 \n");
     }
     return 0;
 }
@@ -22,8 +25,11 @@ void* dummy_task2(void* args)
 {
     (void) args;
     while(1) {
-        //UART::send("dummy task2 \n");
-        asm volatile("wfi");
+        UART::send("dummy task2-1 \n");
+        do_switch();
+        UART::send("dummy task2-2 \n");
+        UART::send("dummy task2-3 \n");
+        UART::send("dummy task2-4 \n");
     }
     return 0;
 }
@@ -66,13 +72,13 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
     UART::send("******************************************\n");
 
     // スレッドスタート
-    start_thread(dummy_task1);
-    start_thread(dummy_task2);
+    start_thread(dummy_task1, 0);
+    start_thread(dummy_task2, 0);
 
     // exec shell
     while(1) {
-        //UART::send("main thread \n");
-        asm volatile("wfi");
+        UART::send("main thread \n");
+        do_switch();
     }
 }
 

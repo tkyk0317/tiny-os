@@ -63,19 +63,57 @@ void do_switch()
 }
 
 /**
+ * スレッドエントリーポイント
+ */
+void entry(THREAD_ENTRY fn, void* args)
+{
+    // スレッドエントリーポイント実行
+    fn(args);
+}
+
+/**
  * スレッド開始
  */
-void start_thread(THREAD_ENTRY fn)
+void start_thread(THREAD_ENTRY fn, void* args)
 {
     // 新しいスレッド用にスタックを割り当てる
     uint64_t* p = reinterpret_cast<uint64_t*>(sp_start);
     sp_start -= PER_THREAD;
 
-    // LRレジスタの位置まで移動し、関数ポインタ設定
-    p = p - 29;
-    *p = reinterpret_cast<uint64_t>(fn);
+    // スレッドエントリーポイントと引数を設定
+    *p-- = reinterpret_cast<uint64_t>(fn); // x0
+    *p-- = reinterpret_cast<uint64_t>(args); // x1
+    *p-- = 0x0; // x2
+    *p-- = 0x0; // x3
+    *p-- = 0x0; // x4
+    *p-- = 0x0; // x5
+    *p-- = 0x0; // x6
+    *p-- = 0x0; // x7
+    *p-- = 0x0; // x8
+    *p-- = 0x0; // x9
+    *p-- = 0x0; // x10
+    *p-- = 0x0; // x11
+    *p-- = 0x0; // x12
+    *p-- = 0x0; // x13
+    *p-- = 0x0; // x14
+    *p-- = 0x0; // x15
+    *p-- = 0x0; // x16
+    *p-- = 0x0; // x17
+    *p-- = 0x0; // x18
+    *p-- = 0x0; // x19
+    *p-- = 0x0; // x20
+    *p-- = 0x0; // x21
+    *p-- = 0x0; // x22
+    *p-- = 0x0; // x23
+    *p-- = 0x0; // x24
+    *p-- = 0x0; // x25
+    *p-- = 0x0; // x26
+    *p-- = 0x0; // x27
+    *p-- = 0x0; // x28
+    *p-- = 0x0; // x29
+    *p = reinterpret_cast<uint64_t>(entry); // x30
 
-    // スレッド切り替え
-    if (createThreadInfo(p)) do_switch();
+    // スレッド情報作成
+    createThreadInfo(p);
 }
 

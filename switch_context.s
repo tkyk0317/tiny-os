@@ -19,7 +19,6 @@ switch_context:
     stp   x28, x29, [sp, #-16]!
     stp   x30, xzr, [sp, #-16]!
 
-
     // SPを変更する
     mov   x19, sp
     str   x19, [x0]
