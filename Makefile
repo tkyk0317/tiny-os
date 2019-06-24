@@ -6,7 +6,7 @@ clean:
 	@ cd build; make -s clean
 	@ rm -rf tiny-os
 
-start:
+start: all
 	@ cd build; qemu-system-aarch64 -m 128 -nographic -monitor telnet::1234,server,nowait -M raspi3 -kernel tiny-os -serial mon:stdio
 
 stop:
