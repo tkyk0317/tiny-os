@@ -22,7 +22,6 @@ start_el2:
     // set sp in EL1.
     ldr   x1, =0x70000
     msr   sp_el1, x1
-    ldr x1, =0x80000
 
     // enable AArch64 in EL1.
     mov   x0, #(1 << 31)      // AArch64
@@ -33,7 +32,8 @@ start_el2:
     ldr x0, =vector
     msr vbar_el1, x0
     // change execution level to EL1.
-    mov   x2, #0x3c4         // D=1, A=1, I=1, F=1 M=EL1t
+    mov   x2, #0x3c5         // D=1, A=1, I=1, F=1 M=EL1h
+    //mov   x2, #0x3c4         // D=1, A=1, I=1, F=1 M=EL1t
     msr   spsr_el2, x2
     adr   x2, start_el1
     msr   elr_el2, x2
@@ -41,6 +41,7 @@ start_el2:
 
 start_el1:
     // set sp
+    ldr   x1, =0x80000
     mov   sp, x1
     // clear bss.
     ldr   x1, =__bss_start

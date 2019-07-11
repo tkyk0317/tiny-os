@@ -4,14 +4,17 @@
 #include "devices/uart/uart.hpp"
 #include "thread.hpp"
 
+extern "C" void enable_irq();
+extern "C" void disable_irq();
+
 /**
  * スタックポインタ取得
  */
-uint64_t* get_sp()
+uint64_t get_sp()
 {
     uint64_t sp;
     asm volatile ("mov %0, sp" : "=r" (sp));
-    return reinterpret_cast<uint64_t*>(sp);
+    return sp;
 }
 
 /**
@@ -21,5 +24,9 @@ void SystemTimerInterrupt::handler()
 {
     // タイマー周期を再設定
     asm volatile ("msr cntv_tval_el0, %0" :: "r" (SystemTimer::getPeriod()));
-    UART::send("Timer \n");
+
+    // 割り込みを有効にし、コンテキストスイッチ
+    enable_irq();
+    do_switch();
+    disable_irq();
 }
