@@ -70,7 +70,6 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
     // exec shell
     while(1) {
         UART::send("main thread \n");
-        do_switch();
     }
 }
 
