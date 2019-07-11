@@ -7,6 +7,7 @@ extern "C" void switch_context(uint64_t**, uint64_t**);
 // スレッドコンテキスト
 typedef struct _ThreadContext {
     uint64_t* stack; // スタック開始アドレス
+    ThreadStatus status; // スレッド起動状態
     _ThreadContext* next; // 次のスレッド構造体へのポインタ
 } ThreadContext;
 
@@ -58,7 +59,11 @@ void do_switch()
 
     // 現在のスレッドから次のスレッドへ切り替える
     uint64_t** cur = &current->stack;
+    current->status = SUSPEND;
     current = current->next;
+    current->status = RUNNING;
+
+    // コンテキストスイッチ
     switch_context(cur, &current->stack);
 }
 
