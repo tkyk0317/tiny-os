@@ -14,3 +14,12 @@ stop:
 
 objdump:
 	@ aarch64-linux-gnu-objdump -S --prefix-addresses build/tiny-os | less
+
+telnet:
+	@ telnet localhost 1234
+
+gdb-server:
+	@ qemu-system-aarch64 -m 128 -nographic -monitor telnet::1234,server,nowait -M raspi3 -kernel build/tiny-os -serial mon:stdio -gdb tcp::4321 -S
+
+gdb-client:
+	@ aarch64-linux-gnu-gdb -i=mi build/tiny-os

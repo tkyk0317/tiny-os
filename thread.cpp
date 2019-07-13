@@ -3,6 +3,7 @@
 
 // アセンブラで定義したスレッド切り替え関数
 extern "C" void switch_context(uint64_t**, uint64_t**);
+extern "C" void switch_el0(uint64_t, uint64_t, uint64_t);
 
 // スレッドコンテキスト
 typedef struct _ThreadContext {
@@ -72,8 +73,12 @@ void do_switch()
  */
 void entry(THREAD_ENTRY fn, void* args)
 {
-    // スレッドエントリーポイント実行
-    fn(args);
+    // EL0へ切り替え、指定エントリーポイントへ
+    switch_el0(
+      reinterpret_cast<uint64_t>(fn),
+      reinterpret_cast<uint64_t>(current->stack),
+      reinterpret_cast<uint64_t>(args)
+    );
 }
 
 /**
