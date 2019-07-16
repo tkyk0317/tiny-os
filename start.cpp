@@ -1,4 +1,5 @@
-#include "thread.hpp"
+#include "fork.hpp"
+#include "scheduler.hpp"
 #include "devices/uart/uart.hpp"
 #include "devices/system_timer/system_timer.hpp"
 #include "devices/register/regs.hpp"
@@ -31,6 +32,9 @@ void* dummy_task2(void* args)
  */
 void init()
 {
+    // スケジューラー初期化
+    Scheduler::init();
+
     // UART割り込み有効
     MMIO::write(IRQ_ENABLE2, IRQ_ENABLE2_UART);
 
@@ -64,13 +68,13 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
     UART::send("******************************************\n");
 
     // スレッドスタート
-    start_thread(dummy_task1, 0);
-    start_thread(dummy_task2, 0);
+    Process::fork(dummy_task1, 0);
+    Process::fork(dummy_task2, 0);
 
     // exec shell
     while(1) {
         UART::send("main thread \n");
-        do_switch();
+        Scheduler::schedule();
     }
 }
 

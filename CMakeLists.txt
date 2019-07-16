@@ -34,9 +34,10 @@ include_directories(./include)
 add_executable(tiny-os
     boot.s
     vector.s
-    switch_context.s
+    context.s
     utils.s
-    thread.cpp
+    fork.cpp
+    scheduler.cpp
     start.cpp
     handler.cpp
 )

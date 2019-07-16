@@ -1,6 +1,6 @@
-.global switch_context
+.global __switch
 
-switch_context:
+__switch:
     // 現在のレジスタを退避
     stp   x0,  x1,  [sp, #-16]!
     stp   x2,  x3,  [sp, #-16]!

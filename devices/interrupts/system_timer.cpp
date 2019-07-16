@@ -1,8 +1,7 @@
 #include <stdint.h>
 #include "devices/interrupts/system_timer.hpp"
 #include "devices/system_timer/system_timer.hpp"
-#include "devices/uart/uart.hpp"
-#include "thread.hpp"
+#include "scheduler.hpp"
 
 extern "C" void enable_irq();
 extern "C" void disable_irq();
@@ -27,6 +26,6 @@ void SystemTimerInterrupt::handler()
 
     // 割り込みを有効にし、コンテキストスイッチ
     enable_irq();
-    do_switch();
+    Scheduler::schedule();
     disable_irq();
 }

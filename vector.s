@@ -55,8 +55,8 @@
     ldp   x0,  x1,  [sp], #16
 .endm
 
-.global switch_el0
-switch_el0:
+.global __switch_el0
+__switch_el0:
     msr   elr_el1, x0  // ジャンプ先を例外リンクレジスタへ
     mov   x0, #1       // ELh
     msr   spsr_el1, x0 // CPUステータスを設定

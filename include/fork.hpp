@@ -1,0 +1,33 @@
+/**
+ * プロセス起動関連ヘッダファイル
+ */
+#pragma once
+
+#include <stdint.h>
+
+// エントリー関数ポインタ
+using TASK_ENTRY = void*(*)(void*);
+
+/**
+ * プロセス起動関連クラス
+ */
+class Process {
+public:
+    // プロセス起動
+    static bool fork(TASK_ENTRY, void*);
+
+private:
+    // スタックポインタ
+    static char* sp_start;
+    static const uint64_t PER_THREAD = 0x800;
+
+    // エントリーポイント
+    static void entry(TASK_ENTRY, void*);
+
+    Process() = delete;
+    ~Process() = delete;
+    Process(const Process&) = delete;
+    Process(const Process&&) = delete;
+    Process& operator=(const Process&) = delete;
+    Process& operator=(const Process&&) = delete;
+};
