@@ -72,7 +72,13 @@ el0_irq:
 // system call
 el0_svc:
     kernel_entry 0
-    bl __fork
+
+    // システムコール発行
+    adr	x27, sys_call_tbl // システムコールテーブルを読み込む
+    uxtw w26, w8          // システムコール番号を読み込む
+    ldr	x16, [x27, x26, lsl #3]
+    blr	x16
+
     bl disable_irq
     kernel_exit 0
 

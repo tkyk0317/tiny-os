@@ -41,12 +41,13 @@ add_executable(tiny-os
     scheduler.cpp
     start.cpp
     handler.cpp
-    sys.cpp
     memory.cpp
+    sys.cpp
 )
 
 # sub directories
 add_subdirectory(devices)
+add_subdirectory(sys)
 
 # link library
 target_link_libraries(
@@ -54,4 +55,5 @@ target_link_libraries(
     uart
     system_timer
     interrupts
+    sys_call
 )

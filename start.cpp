@@ -1,11 +1,12 @@
 #include "asm.h"
-#include "sys.hpp"
 #include "fork.hpp"
 #include "scheduler.hpp"
 #include "devices/uart/uart.hpp"
 #include "devices/system_timer/system_timer.hpp"
 #include "devices/register/regs.hpp"
 #include "devices/mmio/mmio.hpp"
+#include "sys/fork.hpp"
+#include "sys/uart.hpp"
 
 extern "C" void* _Unwind_Resume() { return 0; }
 extern "C" void* __gxx_personality_v0() { return 0; }
@@ -13,6 +14,7 @@ extern "C" void* __gxx_personality_v0() { return 0; }
 void* user_task2(void* args)
 {
     (void) args;
+    UARTSysCall::write_sys_call("user task2 start \n");
     while(1) {
     }
     return 0;
@@ -20,7 +22,8 @@ void* user_task2(void* args)
 
 void* user_task1(void* args)
 {
-    SysCall::fork(user_task2, 0);
+    ForkSysCall::fork_sys_call(user_task2, 0);
+    UARTSysCall::write_sys_call("user task1 start \n");
     (void) args;
     while(1) {
     }
@@ -73,8 +76,8 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
     }
 
     // exec shell
+    UART::send("main task start\n");
     while(1) {
-        //UART::send("main task\n");
         Scheduler::schedule();
     }
 }
