@@ -1,8 +1,7 @@
 #include "fork.hpp"
 #include "scheduler.hpp"
-
-// アセンブラ定義関数
-extern "C" void __switch_el0(uint64_t, uint64_t, uint64_t);
+#include "asm.h"
+#include "devices/uart/uart.hpp"
 
 // スタック領域
 char* Process::sp_start = reinterpret_cast<char*>(0x00060000);
@@ -13,10 +12,11 @@ char* Process::sp_start = reinterpret_cast<char*>(0x00060000);
 void Process::entry(TASK_ENTRY fn, void* args)
 {
     // EL0へ切り替え、指定エントリーポイントへ
+    Scheduler::enable_preempt();
     __switch_el0(
-      reinterpret_cast<uint64_t>(fn),
-      reinterpret_cast<uint64_t>(Scheduler::current_task()),
-      reinterpret_cast<uint64_t>(args)
+        reinterpret_cast<uint64_t>(fn),
+        reinterpret_cast<uint64_t>(Scheduler::current_task()->stack),
+        reinterpret_cast<uint64_t>(args)
     );
 }
 
@@ -25,8 +25,11 @@ void Process::entry(TASK_ENTRY fn, void* args)
  */
 bool Process::fork(TASK_ENTRY fn, void* args)
 {
+    Scheduler::disable_preempt();
+
     // 新しいスレッド用にスタックを割り当てる
     uint64_t* p = reinterpret_cast<uint64_t*>(Process::sp_start);
+    uint64_t* b = reinterpret_cast<uint64_t*>(Process::sp_start);
     Process::sp_start -= Process::PER_THREAD;
 
     // スレッドエントリーポイントと引数を設定
@@ -63,5 +66,8 @@ bool Process::fork(TASK_ENTRY fn, void* args)
     *p = reinterpret_cast<uint64_t>(Process::entry); // x30
 
     // スレッド情報作成
-    return Scheduler::register_task(p);
+    bool ret = Scheduler::register_task(p, b);
+
+    Scheduler::enable_preempt();
+    return ret;
 }

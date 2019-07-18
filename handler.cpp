@@ -1,12 +1,11 @@
 #include <stdlib.h>
+#include "asm.h"
 #include "devices/uart/uart.hpp"
 #include "devices/mmio/mmio.hpp"
 #include "devices/register/regs.hpp"
 #include "devices/interrupts/uart.hpp"
 #include "devices/interrupts/system_timer.hpp"
 
-extern "C" void enable_irq();
-extern "C" void disable_irq();
 
 /**
  * IRQ割り込みハンドラ

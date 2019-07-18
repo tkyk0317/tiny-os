@@ -36,6 +36,7 @@ add_executable(tiny-os
     vector.s
     context.s
     utils.s
+    utils.cpp
     fork.cpp
     scheduler.cpp
     start.cpp

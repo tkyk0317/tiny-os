@@ -11,8 +11,10 @@ enum TaskStatus {
 // タスク管理構造体
 typedef struct _TaskContext {
     uint64_t* stack; // スタック開始アドレス
-    TaskStatus status; // スレッド起動状態
     _TaskContext* next; // 次のスレッド構造体へのポインタ
+    uint64_t* base_stack; // スタック開始アドレス
+    TaskStatus status; // スレッド起動状態
+    uint32_t preempt; // プリエンプトフラグ
 } TaskContext;
 
 /**
@@ -27,10 +29,14 @@ public:
     static void schedule();
 
     // タスク登録
-    static bool register_task(uint64_t*);
+    static bool register_task(uint64_t*, uint64_t*);
 
     // カレントタスク情報取得
     static TaskContext* current_task() { return Scheduler::current; }
+
+    // preempt許可/禁止(0より大き場合、プリエンプト不可能)
+    static void enable_preempt() { Scheduler::current->preempt--; }
+    static void disable_preempt() { Scheduler::current->preempt++; }
 
 private:
     // 現在のタスク
@@ -43,6 +49,10 @@ private:
 
     // 次タスク
     static uint32_t next();
+
+    // タスク切り替え
+    static void switch_task();
+
 
     Scheduler() = delete;
     ~Scheduler() = delete;

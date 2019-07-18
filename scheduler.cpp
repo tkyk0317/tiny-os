@@ -1,19 +1,25 @@
 #include "scheduler.hpp"
 #include "fork.hpp"
-
-// アセンブラで定義したスレッド切り替え関数
-extern "C" void __switch(uint64_t**, uint64_t**);
+#include "asm.h"
+#include "devices/uart/uart.hpp"
 
 // タスク関連データ初期化
 TaskContext Scheduler::context[Scheduler::TASK_NUMS];
 TaskContext* Scheduler::current;
 uint32_t Scheduler::created_task_nums;
 
+extern "C" void __preempt_enable() { Scheduler::enable_preempt(); }
+
 /**
  * 初期化処理
  */
 void Scheduler::init()
 {
+    for (uint32_t i = 0 ; i < TASK_NUMS ; i++) {
+        Scheduler::context[i].next = 0;
+        Scheduler::context[i].stack = 0;
+        Scheduler::context[i].preempt = 0;
+    }
     Scheduler::created_task_nums = 0;
     Scheduler::current = &Scheduler::context[0];
 }
@@ -30,27 +36,48 @@ uint32_t Scheduler::next()
 /**
  * スレッド登録
  */
-bool Scheduler::register_task(uint64_t* stack)
+bool Scheduler::register_task(uint64_t* stack, uint64_t* base)
 {
-    uint32_t n = Scheduler::next();
-    if (n == 0) return false; // もう作成できない
+    if (0 == Scheduler::next()) return false; // もう作成できない
 
     // 起動するスレッドの情報を作成
+    uint32_t n = Scheduler::next();
     Scheduler::context[n].stack = stack;
+    Scheduler::context[n].base_stack = base;
+    Scheduler::context[n].preempt = 1; // エントリーポイントにジャンプ後、解除
     Scheduler::context[n].next = &Scheduler::context[0]; // ヘッドにつなげておく
-    Scheduler::created_task_nums = next();
+    Scheduler::created_task_nums = n;
 
     // 次のスレッドへのポインタを設定
     Scheduler::context[n - 1].next = &Scheduler::context[n];
+
     return true;
 }
 
 /**
- * スレッド切り替え
+ * スケジューラー
  */
 void Scheduler::schedule()
 {
+    if (Scheduler::current->preempt > 0) return;
+
+    // プリエンプト禁止
+    Scheduler::disable_preempt();
+
+    // コンテキストスイッチ
+    Scheduler::switch_task();
+
+    // プリエンプト許可
+    Scheduler::enable_preempt();
+}
+
+/**
+ * タスク切り替え
+ */
+void Scheduler::switch_task()
+{
     if (!Scheduler::current->next) return; // 次のタスクが存在しない
+    if (!Scheduler::current->next->stack) return; // スタック未設定時はスイッチしない
     if (Scheduler::current == Scheduler::current->next) return; // 同じタスクへはスイッチしない
 
     // 現在のスレッドから次のスレッドへ切り替える

@@ -4,25 +4,25 @@
 #include "devices/system_timer/system_timer.hpp"
 #include "devices/register/regs.hpp"
 #include "devices/mmio/mmio.hpp"
+#include "asm.h"
 
-extern "C" void enable_irq();
 extern "C" void* _Unwind_Resume() { return 0; }
 extern "C" void* __gxx_personality_v0() { return 0; }
 
-void* dummy_task1(void* args)
+void* user_task1(void* args)
 {
     (void) args;
     while(1) {
-        UART::send("dummy task1 \n");
+        //UART::send("dummy task1 \n");
     }
     return 0;
 }
 
-void* dummy_task2(void* args)
+void* user_task2(void* args)
 {
     (void) args;
     while(1) {
-        UART::send("dummy task2 \n");
+        //UART::send("dummy task2 \n");
     }
     return 0;
 }
@@ -68,12 +68,15 @@ extern "C" void __start_kernel(uint32_t r0, uint32_t r1, uint32_t atags)
     UART::send("******************************************\n");
 
     // スレッドスタート
-    Process::fork(dummy_task1, 0);
-    Process::fork(dummy_task2, 0);
+    if (false == Process::fork(user_task1, 0)) {
+        UART::send("Error user_task1 fork \n");
+    }
+    if (false == Process::fork(user_task2, 0)) {
+        UART::send("Error user_task2 fork \n");
+    }
 
     // exec shell
     while(1) {
-        UART::send("main thread \n");
         Scheduler::schedule();
     }
 }

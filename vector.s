@@ -53,30 +53,21 @@
     ldp   x4,  x5,  [sp], #16
     ldp   x2,  x3,  [sp], #16
     ldp   x0,  x1,  [sp], #16
-.endm
 
-.global __switch_el0
-__switch_el0:
-    msr   elr_el1, x0  // ジャンプ先を例外リンクレジスタへ
-    mov   x0, #1       // ELh
-    msr   spsr_el1, x0 // CPUステータスを設定
-    msr   sp_el0, x1   // EL0スタックポインタを設定
-    mov   x0, x2       // エントリーポイントの引数を設定
     eret
+.endm
 
 // Interrupt Handler for EL1-IRQ
 el1_irq:
     kernel_entry 1
     bl    __irq_handler
     kernel_exit 1
-    eret
 
-// Interrupt Handler for Elo-IRQ
+// Interrupt Handler for EL0-IRQ
 el0_irq:
     kernel_entry 0
     bl    __irq_handler
     kernel_exit 0
-    eret
 
 .balign 2048
 vector:
@@ -107,17 +98,16 @@ vector:
 .balign 128
     b hang
 .balign 128
-    // EL1t IRQ
-    b hang
-.balign 128
-    b hang
-.balign 128
-    b hang
-.balign 128
-    b hang
-.balign 128
-    // EL0h IRQ
+    // EL0t IRQ
     b el0_irq
+.balign 128
+    b hang
+.balign 128
+    b hang
+.balign 128
+    b hang
+.balign 128
+    b hang
 .balign 128
     b hang
 .balign 128
@@ -125,8 +115,10 @@ vector:
 
 .global hang
 hang:
+    bl show_registers
+loop:
     wfi
-    b hang
+    b loop
 
 .global enable_irq
 enable_irq:
@@ -137,3 +129,15 @@ enable_irq:
 disable_irq:
     msr   daifset, #2
     ret
+
+.global __switch_el0
+__switch_el0:
+    bl    disable_irq
+    msr   elr_el1, x0  // ジャンプ先を例外リンクレジスタへ
+    mov   x30, x0
+    msr   sp_el0, x1   // EL0スタックポインタを設定
+    mov   x3, #0       // EL0t
+    msr   spsr_el1, x3 // CPUステータスを設定
+    mov   x0, x2
+    eret
+

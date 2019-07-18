@@ -7,7 +7,7 @@ clean:
 	@ rm -rf tiny-os
 
 start: all
-	@ cd build; qemu-system-aarch64 -m 128 -nographic -monitor telnet::1234,server,nowait -M raspi3 -kernel tiny-os -serial mon:stdio
+	@ cd build; qemu-system-aarch64 -cpu cortex-a53 -m 128 -nographic -monitor telnet::1234,server,nowait -M raspi3 -kernel tiny-os -serial mon:stdio
 
 stop:
 	@ kill `pgrep qemu`

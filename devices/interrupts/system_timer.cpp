@@ -1,20 +1,7 @@
-#include <stdint.h>
 #include "devices/interrupts/system_timer.hpp"
 #include "devices/system_timer/system_timer.hpp"
+#include "asm.h"
 #include "scheduler.hpp"
-
-extern "C" void enable_irq();
-extern "C" void disable_irq();
-
-/**
- * スタックポインタ取得
- */
-uint64_t get_sp()
-{
-    uint64_t sp;
-    asm volatile ("mov %0, sp" : "=r" (sp));
-    return sp;
-}
 
 /**
  * システムタイマー割り込みハンドラ

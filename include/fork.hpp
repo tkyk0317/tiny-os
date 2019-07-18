@@ -19,7 +19,7 @@ public:
 private:
     // スタックポインタ
     static char* sp_start;
-    static const uint64_t PER_THREAD = 0x800;
+    static const uint64_t PER_THREAD = 0x10000;
 
     // エントリーポイント
     static void entry(TASK_ENTRY, void*);
