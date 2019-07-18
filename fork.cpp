@@ -1,10 +1,8 @@
 #include "fork.hpp"
 #include "scheduler.hpp"
 #include "asm.h"
+#include "memory.hpp"
 #include "devices/uart/uart.hpp"
-
-// スタック領域
-char* Process::sp_start = reinterpret_cast<char*>(0x00060000);
 
 /**
  * スレッドエントリーポイント
@@ -28,9 +26,8 @@ bool Process::fork(TASK_ENTRY fn, void* args)
     Scheduler::disable_preempt();
 
     // 新しいスレッド用にスタックを割り当てる
-    uint64_t* p = reinterpret_cast<uint64_t*>(Process::sp_start);
-    uint64_t* b = reinterpret_cast<uint64_t*>(Process::sp_start);
-    Process::sp_start -= Process::PER_THREAD;
+    uint64_t* p = MemoryManager::get_page();
+    uint64_t* b = p;
 
     // スレッドエントリーポイントと引数を設定
     *p-- = reinterpret_cast<uint64_t>(fn); // x0

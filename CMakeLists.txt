@@ -42,6 +42,7 @@ add_executable(tiny-os
     start.cpp
     handler.cpp
     sys.cpp
+    memory.cpp
 )
 
 # sub directories
