@@ -69,6 +69,13 @@ el0_irq:
     bl    __irq_handler
     kernel_exit 0
 
+// system call
+el0_svc:
+    kernel_entry 0
+    bl __fork
+    bl disable_irq
+    kernel_exit 0
+
 .balign 2048
 vector:
 .balign 128
@@ -96,7 +103,8 @@ vector:
     // SError Interrupt
     b hang
 .balign 128
-    b hang
+    // Sync Interrupt
+    b el0_svc
 .balign 128
     // EL0t IRQ
     b el0_irq

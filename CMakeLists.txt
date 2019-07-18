@@ -41,6 +41,7 @@ add_executable(tiny-os
     scheduler.cpp
     start.cpp
     handler.cpp
+    sys.cpp
 )
 
 # sub directories
