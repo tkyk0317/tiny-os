@@ -38,6 +38,9 @@ public:
     static void enable_preempt() { Scheduler::current->preempt--; }
     static void disable_preempt() { Scheduler::current->preempt++; }
 
+    // タスク情報表示
+    static void show_taskinfo();
+
 private:
     // 現在のタスク
     static TaskContext* current;

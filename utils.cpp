@@ -27,5 +27,7 @@ extern "C" void show_registers()
         UART::sendHex(*sp);
         UART::send("\n");
     }
+
+    Scheduler::show_taskinfo();
     UART::send("===============================================\n");
 }

@@ -90,3 +90,18 @@ void Scheduler::switch_task()
     __switch(cur, &Scheduler::current->stack);
 }
 
+/**
+ * タスク情報出力
+ */
+void Scheduler::show_taskinfo()
+{
+    UART::send("\nTask Information\n");
+    for(uint32_t i = 0 ; i < Scheduler::TASK_NUMS ; i++) {
+        UART::send("\tNo: "); UART::sendHex(i);
+        UART::send(" Start SP: "); UART::sendHex(reinterpret_cast<uint64_t>(Scheduler::context[i].base_stack));
+        UART::send(" SP: "); UART::sendHex(reinterpret_cast<uint64_t>(Scheduler::context[i].stack));
+        UART::send(" Status: "); UART::sendHex(Scheduler::context[i].status);
+        UART::send(" Preempt: "); UART::sendHex(Scheduler::context[i].preempt);
+        UART::send("\n");
+    }
+}
