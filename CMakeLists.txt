@@ -22,7 +22,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # configuration of flags
 set(CMAKE_ASM_FLAGS "-mcpu=cortex-a53")
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -nostdlib -mcpu=cortex-a53 -fpic -ffreestanding -g")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -nostdlib -mcpu=cortex-a53 -fpic -ffreestanding -Wno-ignored-qualifiers -g")
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 # set linker script
@@ -49,10 +49,12 @@ add_executable(tiny-os
 # sub directories
 add_subdirectory(devices)
 add_subdirectory(sys)
+add_subdirectory(usr)
 
 # link library
 target_link_libraries(
     tiny-os
+    usr
     uart
     system_timer
     interrupts
