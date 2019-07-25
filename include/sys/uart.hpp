@@ -7,9 +7,6 @@
  */
 class UARTSysCall {
 public:
-    // writeシステムコール
-    static void write_sys_call(const char* const);
-
     // カーネルからコールされるメソッド
     static void __write(uint64_t);
 

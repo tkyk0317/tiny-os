@@ -8,7 +8,7 @@ _boot:
     cmp   x1, #0
     bne   hang
     // set stack pointer
-    ldr   x1, =0x00080000
+    ldr   x1, =0x20000
     // drop to EL2.
     mov   x2, #0x5b1    // RW=1, HCE=1, SMD=1, RES=1, NS=1
     msr   scr_el3, x2
@@ -20,7 +20,7 @@ _boot:
 
 start_el2:
     // set sp in EL1.
-    ldr   x1, =0x70000
+    ldr   x1, =0x10000
     msr   sp_el1, x1
 
     // enable AArch64 in EL1.
@@ -41,7 +41,7 @@ start_el2:
 
 start_el1:
     // set sp
-    ldr   x1, =0x80000
+    ldr   x1, =0x20000
     mov   sp, x1
     // clear bss.
     ldr   x1, =__bss_start

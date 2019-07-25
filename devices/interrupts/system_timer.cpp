@@ -11,8 +11,6 @@ void SystemTimerInterrupt::handler()
     // タイマー周期を再設定
     asm volatile ("msr cntv_tval_el0, %0" :: "r" (SystemTimer::getPeriod()));
 
-    // 割り込みを有効にし、コンテキストスイッチ
-    enable_irq();
-    Scheduler::schedule();
-    disable_irq();
+    // スケジューラーへタイマー通知
+    Scheduler::timer();
 }

@@ -26,7 +26,7 @@ __switch:
     mov   sp, x19
 
     // スイッチ対象のコンテキストのレジスタを復元
-    ldp   x30, xzr, [sp], #16
+    ldp   x30, x29, [sp], #16 // dummyでx29に読み込む
     ldp   x28, x29, [sp], #16
     ldp   x26, x27, [sp], #16
     ldp   x24, x25, [sp], #16

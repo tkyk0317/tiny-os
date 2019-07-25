@@ -1,6 +1,6 @@
 #include "memory.hpp"
 
-char* MemoryManager::start_page = reinterpret_cast<char*>(0x00060000);
+char* MemoryManager::start_page = reinterpret_cast<char*>(0x00080000);
 
 /**
  * メモリ領域取得

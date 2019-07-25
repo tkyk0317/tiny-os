@@ -22,6 +22,7 @@ void Scheduler::init()
     }
     Scheduler::created_task_nums = 0;
     Scheduler::current = &Scheduler::context[0];
+    Scheduler::current->base_stack = reinterpret_cast<uint64_t*>(0x20000);
 }
 
 /**
@@ -59,8 +60,6 @@ bool Scheduler::register_task(uint64_t* stack, uint64_t* base)
  */
 void Scheduler::schedule()
 {
-    if (Scheduler::current->preempt > 0) return;
-
     // プリエンプト禁止
     Scheduler::disable_preempt();
 
@@ -88,6 +87,19 @@ void Scheduler::switch_task()
 
     // コンテキストスイッチ
     __switch(cur, &Scheduler::current->stack);
+}
+
+/**
+ * タイマー割り込み通知
+ */
+void Scheduler::timer()
+{
+    if (Scheduler::current->preempt > 0) return;
+
+    // 割り込みを有効化し、コンテキストスイッチ
+    enable_irq();
+    Scheduler::schedule();
+    disable_irq();
 }
 
 /**

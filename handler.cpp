@@ -6,7 +6,6 @@
 #include "devices/interrupts/uart.hpp"
 #include "devices/interrupts/system_timer.hpp"
 
-
 /**
  * IRQ割り込みハンドラ
  *

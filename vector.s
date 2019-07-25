@@ -28,16 +28,16 @@
     .endif
 .endm
 
-.macro kernel_exit el
+.macro kernel_exit el, sys
     .if \el == 0
-        ldp x22, x23, [sp], #16
+        ldp x22, x23, [sp], #16 // dummyでx23へ読み込む
         msr sp_el0, x22
     .endif
 
     ldp   x22, x23, [sp], #16
     msr   elr_el1, x22
     msr   spsr_el1, x23
-    ldp   x30, xzr, [sp], #16
+    ldp   x30, x29, [sp], #16
     ldp   x28, x29, [sp], #16
     ldp   x26, x27, [sp], #16
     ldp   x24, x25, [sp], #16
@@ -52,8 +52,13 @@
     ldp   x6,  x7,  [sp], #16
     ldp   x4,  x5,  [sp], #16
     ldp   x2,  x3,  [sp], #16
-    ldp   x0,  x1,  [sp], #16
 
+    .if \sys == 0
+        ldp   x0,  x1,  [sp], #16
+    .else
+        // システムコールの結果がx0に入っているので、復元しない
+        ldp   xzr, x1,  [sp], #16
+    .endif
     eret
 .endm
 
@@ -61,13 +66,13 @@
 el1_irq:
     kernel_entry 1
     bl    __irq_handler
-    kernel_exit 1
+    kernel_exit 1, 0
 
 // Interrupt Handler for EL0-IRQ
 el0_irq:
     kernel_entry 0
     bl    __irq_handler
-    kernel_exit 0
+    kernel_exit 0, 0
 
 // system call
 el0_svc:
@@ -76,11 +81,12 @@ el0_svc:
     // システムコール発行
     adr	x27, sys_call_tbl // システムコールテーブルを読み込む
     uxtw w26, w8          // システムコール番号を読み込む
+    bl enable_irq
     ldr	x16, [x27, x26, lsl #3]
     blr	x16
 
     bl disable_irq
-    kernel_exit 0
+    kernel_exit 0, 1
 
 .balign 2048
 vector:
@@ -129,7 +135,7 @@ vector:
 
 .global hang
 hang:
-    bl show_registers
+    //bl show_registers
 loop:
     wfi
     b loop
@@ -148,7 +154,6 @@ disable_irq:
 __switch_el0:
     bl    disable_irq
     msr   elr_el1, x0  // ジャンプ先を例外リンクレジスタへ
-    mov   x30, x0
     msr   sp_el0, x1   // EL0スタックポインタを設定
     mov   x3, #0       // EL0t
     msr   spsr_el1, x3 // CPUステータスを設定

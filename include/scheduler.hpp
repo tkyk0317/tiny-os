@@ -28,6 +28,9 @@ public:
     // スケジューラー実行
     static void schedule();
 
+    // タイマー割り込み通知
+    static void timer();
+
     // タスク登録
     static bool register_task(uint64_t*, uint64_t*);
 

@@ -4,4 +4,6 @@ add_library(
     sys_call
     fork.cpp
     uart.cpp
+    uart.s
+    fork.s
 )
