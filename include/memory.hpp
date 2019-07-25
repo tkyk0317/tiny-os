@@ -12,7 +12,7 @@ public:
 
 private:
     static char* start_page;
-    static const uint64_t PAGE_SIZE = 0x800;
+    static const uint64_t PAGE_SIZE = 1024 * 4; // 4KB
 
     MemoryManager() = delete;
     ~MemoryManager() = delete;
