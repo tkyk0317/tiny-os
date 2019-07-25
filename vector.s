@@ -135,7 +135,7 @@ vector:
 
 .global hang
 hang:
-    //bl show_registers
+    bl show_registers
 loop:
     wfi
     b loop

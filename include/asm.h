@@ -19,10 +19,3 @@ extern "C" void enable_irq();
 
 // 割り込み無効化
 extern "C" void disable_irq();
-
-// writeシステムコール
-extern "C" void write_sys_call(char*);
-
-// forkシステムコール
-typedef void* (*ENTRY_POINT)(void*);
-extern "C" void fork_sys_call(ENTRY_POINT, void*);

@@ -1,12 +1,11 @@
 #include "asm.h"
+#include "sys.h"
 #include "fork.hpp"
 #include "scheduler.hpp"
 #include "devices/uart/uart.hpp"
 #include "devices/system_timer/system_timer.hpp"
 #include "devices/register/regs.hpp"
 #include "devices/mmio/mmio.hpp"
-#include "sys/fork.hpp"
-#include "sys/uart.hpp"
 
 extern "C" void* _Unwind_Resume() { return 0; }
 extern "C" void* __gxx_personality_v0() { return 0; }
