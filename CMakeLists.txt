@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5.1)
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 
+project(TinyOS)
+
 # enable assembly
 enable_language(ASM)
 
@@ -42,7 +44,6 @@ add_executable(tiny-os
     start.cpp
     handler.cpp
     memory.cpp
-    sys_table.cpp
 )
 
 # sub directories
