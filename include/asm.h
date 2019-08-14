@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // CurrentEL取得
 extern "C" uint64_t get_el();

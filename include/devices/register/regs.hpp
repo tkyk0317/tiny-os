@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // GPU割り込み関連レジスタ
 const uint32_t GPU_INTERRUPTS_ROUTING = 0x4000000C;

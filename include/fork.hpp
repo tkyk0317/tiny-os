@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // エントリー関数ポインタ
 using TASK_ENTRY = void*(*)(void*);

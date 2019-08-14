@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 #include "scheduler.hpp"
 #include "devices/uart/uart.hpp"
 

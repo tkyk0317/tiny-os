@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 #include "devices/system_timer/system_timer.hpp"
 #include "devices/register/regs.hpp"
 #include "devices/mmio/mmio.hpp"
