@@ -84,6 +84,10 @@ el0_sync:
     cmp	x24, #0x15
 
     b.eq el0_svc
+
+    // データアボートチェック
+    cmp	x24, #0x24
+    b.eq el0_da
     b hang
 
 el0_svc:
@@ -95,6 +99,14 @@ el0_svc:
     blr	x16
     bl disable_irq
     kernel_exit 0, 1
+
+el0_da:
+    bl enable_irq
+    mrs x0, far_el1
+    mrs x1, esr_el1
+    bl do_mem_abort
+    bl disable_irq
+    kernel_exit 0, 0
 
 .balign 2048
 vector:

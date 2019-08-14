@@ -1,6 +1,7 @@
 #include "asm.h"
 #include "fork.hpp"
 #include "scheduler.hpp"
+#include "memory.hpp"
 #include "devices/uart/uart.hpp"
 #include "devices/system_timer/system_timer.hpp"
 #include "devices/register/regs.hpp"
@@ -18,6 +19,9 @@ extern void* user_task3(void*);
  */
 void init()
 {
+    // メモリーユニット初期化
+    MemoryManager::init();
+
     // スケジューラー初期化
     Scheduler::init();
 
