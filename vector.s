@@ -75,16 +75,24 @@ el0_irq:
     kernel_exit 0, 0
 
 // system call
-el0_svc:
+el0_sync:
     kernel_entry 0
 
+    // システムコールチェック
+    mrs	x25, esr_el1
+    lsr	x24, x25, #26
+    cmp	x24, #0x15
+
+    b.eq el0_svc
+    b hang
+
+el0_svc:
     // システムコール発行
     adr	x27, sys_call_tbl // システムコールテーブルを読み込む
     uxtw w26, w8          // システムコール番号を読み込む
     bl enable_irq
     ldr	x16, [x27, x26, lsl #3]
     blr	x16
-
     bl disable_irq
     kernel_exit 0, 1
 
@@ -116,7 +124,7 @@ vector:
     b hang
 .balign 128
     // Sync Interrupt
-    b el0_svc
+    b el0_sync
 .balign 128
     // EL0t IRQ
     b el0_irq
