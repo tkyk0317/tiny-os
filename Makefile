@@ -23,3 +23,6 @@ gdb-server:
 
 gdb-client:
 	@ aarch64-linux-gnu-gdb -i=mi build/tiny-os
+
+test: all
+	@ cd build; ctest --progress

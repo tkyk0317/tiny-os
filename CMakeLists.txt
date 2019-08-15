@@ -25,10 +25,6 @@ set(CMAKE_ASM_FLAGS "-mcpu=cortex-a53")
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -nostdlib -mcpu=cortex-a53 -fpic -ffreestanding -Wno-ignored-qualifiers -g")
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-# set linker script
-set(LINKER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld)
-add_link_options("-T${LINKER_FILE}")
-
 # include path
 include_directories(./include)
 
@@ -60,3 +56,16 @@ target_link_libraries(
     interrupts
     sys_call
 )
+
+# set linker script
+set(LINKER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld)
+target_link_options(
+    tiny-os
+    PRIVATE
+    "-T${LINKER_FILE}"
+)
+
+# enable test
+enable_testing()
+add_subdirectory(tests)
+
