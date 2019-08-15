@@ -26,3 +26,22 @@ gdb-client:
 
 test: all
 	@ cd build; ctest --progress
+
+.PHONY: docker-build
+docker-build:
+	@ docker build . -t tiny-os
+	@ docker run --rm -it tiny-os sh -c "rm -f build/CMakeCache.txt && make"
+
+.PHONY: docker-start
+docker-start:
+	@ docker build . -t tiny-os
+	@ docker run --name tiny-os --rm -it tiny-os sh -c "rm -f build/CMakeCache.txt && make start"
+
+.PHONY: docker-stop
+docker-stop:
+	@ docker kill tiny-os
+
+.PHONY: docker-test
+docker-test:
+	@ docker build . -t tiny-os
+	@ docker run --rm -it tiny-os sh -c "rm -f build/CMakeCache.txt && make test"
