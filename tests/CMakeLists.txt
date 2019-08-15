@@ -15,7 +15,7 @@ set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_RANLIB ranlib)
 set(CMAKE_LINKER gcc)
 set(CMAKE_ASM_FLAGS "")
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -g")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -g")
 
 add_test(
     NAME tiny-os-test
