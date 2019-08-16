@@ -40,17 +40,20 @@ add_executable(tiny-os
     start.cpp
     handler.cpp
     memory.cpp
+    shell.cpp
 )
 
 # sub directories
 add_subdirectory(devices)
 add_subdirectory(sys)
 add_subdirectory(usr)
+add_subdirectory(lib)
 
 # link library
 target_link_libraries(
     tiny-os
     usr
+    str
     uart
     system_timer
     interrupts

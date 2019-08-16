@@ -1,19 +1,12 @@
 #include "CppUTest/CommandLineTestRunner.h"
-#include "CppUTestExt/MockSupport.h"
 #include <iostream>
 #include <scheduler.hpp>
 
 // テストグループを定義
 TEST_GROUP(TestSchdule)
 {
-    TEST_SETUP()
-    {
-    }
-
-    TEST_TEARDOWN()
-    {
-        mock().clear();
-    }
+    TEST_SETUP() {}
+    TEST_TEARDOWN() {}
 };
 
 /**

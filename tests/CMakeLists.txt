@@ -32,6 +32,8 @@ add_executable(
     ../../devices/uart/uart.cpp
 )
 
+add_subdirectory(lib)
+
 target_compile_options(
     tiny-os-test
     PRIVATE
