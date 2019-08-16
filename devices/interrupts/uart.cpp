@@ -1,3 +1,4 @@
+#include "shell.hpp"
 #include "devices/mmio/mmio.hpp"
 #include "devices/register/regs.hpp"
 #include "devices/uart/uart.hpp"
@@ -18,7 +19,7 @@ void UARTInterrupt::handler()
  */
 void UARTInterrupt::receive() const
 {
+    // 受信したデータをシェルへ
     uint32_t c = UART::receive();
-    if (c == 0xD) c = '\n';
-    UART::sendChar(static_cast<char>(c));
+    Shell::receive(c);
 }

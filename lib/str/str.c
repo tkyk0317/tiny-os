@@ -19,3 +19,18 @@ int strcmp(const char* s1, const char* s2)
     }
     return 0;
 }
+
+/**
+ * 文字列比較
+ *
+ * 与えられた2つの文字列を、与えられた範囲で等しいかチェックする。
+ *
+ * @return 0: 文字列一致 -1: 文字列不一致
+ */
+int strncmp(const char* s1, const char* s2, int len)
+{
+    for (int i = 0 ; i < len ; i++) {
+        if(s1[i] != s2[i]) return -1;
+    }
+    return 0;
+}

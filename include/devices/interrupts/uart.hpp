@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * UART関連割り込みクラス
  */
