@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.13.4)
-
 include_directories(./cpputest/include ../include)
 
 # C++ Version

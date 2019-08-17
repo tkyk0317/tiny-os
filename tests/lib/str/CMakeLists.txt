@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.13.4)
-
 add_test(
     NAME str-lib-test
     COMMAND $<TARGET_FILE:str-lib-test>
