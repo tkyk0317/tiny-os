@@ -23,6 +23,10 @@ private:
     static void command_dummy();
     // helpコマンド
     static void command_help();
+    // loadコマンド
+    static void command_load();
+    // dumpコマンド
+    static void command_dump();
 
     Shell() = delete;
     ~Shell() = delete;

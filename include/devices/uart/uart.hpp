@@ -22,6 +22,15 @@ public:
     // UARTからの受信
     static uint32_t receive();
 
+    // 受信チェック
+    static bool isReceive();
+
+    // 割り込み無効化
+    static void disableInt();
+
+    // 割り込み有効化
+    static void enableInt();
+
     UART() = delete ;
     ~UART() = delete;
     UART(const UART&) = delete;

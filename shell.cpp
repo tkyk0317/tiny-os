@@ -5,6 +5,7 @@
 #include "shell.hpp"
 #include "fork.hpp"
 #include "devices/uart/uart.hpp"
+#include "devices/uart/transfer.hpp"
 
 // ダミーUserタスク
 extern void* user_task1(void*);
@@ -52,15 +53,14 @@ void Shell::receive(uint32_t c)
         UART::sendChar(static_cast<char>(c));
     }
     else {
-        // コマンドに応じた処理
-        if (0 == strncmp("help", Shell::buf, 4)) {
-            // ヘルプコマンド
-            Shell::command_help();
-        }
-        else if (0 == strncmp("dummy", Shell::buf, 5)){
-            // ダミータスク実行コマンド
-            Shell::command_dummy();
-        }
+        // ヘルプコマンド
+        if (0 == strncmp("help", Shell::buf, 4)) Shell::command_help();
+        // ダミータスク実行コマンド
+        else if (0 == strncmp("dummy", Shell::buf, 5)) Shell::command_dummy();
+        // XMODEMファイル転送
+        else if (0 == strncmp("load", Shell::buf, 4)) Shell::command_load();
+        // XMODEM転送データダンプ
+        else if (0 == strncmp("dump", Shell::buf, 4)) Shell::command_dump();
         else if (0 == strncmp("quit", Shell::buf, 4)) {
             // 終了コマンド
             UART::send("\n");
@@ -101,8 +101,36 @@ void Shell::command_help()
 {
     UART::send("\n-----------------------------\n");
     UART::send("Usage:\n");
-    UART::send("\thelp: command help\n");
-    UART::send("\tdummy: start dummy user task\n");
-    UART::send("\tquit: end tiny-os\n");
+    UART::send("  dummy: start dummy user task\n");
+    UART::send("  dump:  dump received data by load command\n");
+    UART::send("  help:  command help\n");
+    UART::send("  load:  send file with XMODEM (MaxSize=10K)\n");
+    UART::send("  quit:  end tiny-os\n");
     UART::send("-----------------------------\n");
+}
+
+/**
+ * loadコマンド
+ *
+ * ファイル転送中に他のデータを受信すると（ターミナルからの入力等）
+ * XMODEMでのデータ受信がおかしくなるので、UARTの受信割り込みを無効化
+ */
+void Shell::command_load()
+{
+    // UART受信割り込みを無効化
+    UART::disableInt();
+
+    UART::send("\nstart loading... \n");
+    UARTTransfer::load();
+
+    // UART受信割り込みを有効化
+    UART::enableInt();
+}
+
+/**
+ * dumpコマンド
+ */
+void Shell::command_dump()
+{
+    UARTTransfer::dump();
 }

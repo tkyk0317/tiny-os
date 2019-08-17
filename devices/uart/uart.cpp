@@ -95,6 +95,16 @@ uint32_t UART::receive()
 }
 
 /**
+ * 受信チェック
+ *
+ * @return true: 受信可能 false: 受信不可能
+ */
+bool UART::isReceive()
+{
+    return 0 == (MMIO::read(UART0_FR) & (1 << 4));
+}
+
+/**
  * HEX出力
  */
 void UART::sendHex(uint64_t n)
@@ -102,3 +112,24 @@ void UART::sendHex(uint64_t n)
     const char *hexdigits = "0123456789ABCDEF";
     for (int i = 60; i >= 0; i -= 4) sendChar(hexdigits[(n >> i) & 0xf]);
 }
+
+/**
+ * 割り込み無効化
+ */
+void UART::disableInt()
+{
+    MMIO::write(UART0_CR, 0x00000000);
+    MMIO::write(UART0_IMSC, 0); // 割り込み無効
+    MMIO::write(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
+}
+
+/**
+ * 割り込み有効化
+ */
+void UART::enableInt()
+{
+    MMIO::write(UART0_CR, 0x00000000);
+    MMIO::write(UART0_IMSC, UART_MIS_RXMIS); // 受信割り込みのみ
+    MMIO::write(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
+}
+
