@@ -26,8 +26,8 @@ add_executable(
     main.cpp
     scheduler.cpp
     stub.cpp
-    ../../scheduler.cpp
-    ../../devices/uart/uart.cpp
+    ${CMAKE_SOURCE_DIR}/scheduler.cpp
+    ${CMAKE_SOURCE_DIR}/devices/uart/uart.cpp
 )
 
 add_subdirectory(lib)
