@@ -48,6 +48,7 @@ add_subdirectory(devices)
 add_subdirectory(sys)
 add_subdirectory(usr)
 add_subdirectory(lib)
+add_subdirectory(elf)
 
 # link library
 target_link_libraries(

@@ -31,6 +31,7 @@ add_executable(
 )
 
 add_subdirectory(lib)
+add_subdirectory(elf)
 
 target_compile_options(
     tiny-os-test
