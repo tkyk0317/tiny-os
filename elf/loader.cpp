@@ -1,3 +1,9 @@
+/**
+ * ELFローダー実装ファイル
+ *
+ * http://caspar.hazymoon.jp/OpenBSD/annex/elf.html
+ * http://softwaretechnique.jp/OS_Development/Tips/ELF/elf01.html
+ */
 #include "elf/loader.hpp"
 
 // ELF構造体
@@ -9,13 +15,22 @@ ELF64Data ELFLoader::elf;
 void ELFLoader::analysis(const uint8_t* data)
 {
     // ヘッダロード
-    ELFLoader::loadHeader(data);
+    ELFLoader::loadELFHeader(data);
+
+    // プログラムヘッダテーブルから各セグメントを読む
+    for (uint64_t i = 0; i < ELFLoader::elf.header.phnum; i++) {
+        ELF64ProgHeader h = ELFLoader::loadProgHeader(
+            data + ELFLoader::elf.header.phoff + i * ELFLoader::elf.header.phentsize
+        );
+        // メモリへ展開
+        // ToDo
+    }
 }
 
 /**
- * ヘッダロード
+ * ELFヘッダロード
  */
-void ELFLoader::loadHeader(const uint8_t* data)
+void ELFLoader::loadELFHeader(const uint8_t* data)
 {
     uint8_t* h = const_cast<uint8_t*>(data);
 
@@ -73,4 +88,24 @@ void ELFLoader::loadHeader(const uint8_t* data)
     // read shstrndx
     ELFLoader::elf.header.shstrndx = *reinterpret_cast<uint16_t*>(h);
     h += sizeof(ELFLoader::elf.header.shstrndx);
+}
+
+/**
+ * プログラムヘッダーロード
+ */
+ELF64ProgHeader ELFLoader::loadProgHeader(const uint8_t* data)
+{
+    ELF64ProgHeader header;
+    uint64_t* prog_h = reinterpret_cast<uint64_t*>(const_cast<uint8_t*>(data));
+
+    // 各パラメータ読み込み
+    header.type = *prog_h++;
+    header.flags = *prog_h++;
+    header.offset = *prog_h++;
+    header.v_addr = *prog_h++;
+    header.p_addr = *prog_h++;
+    header.size_in_file = *prog_h++;
+    header.size_in_mem = *prog_h++;
+    header.align = *prog_h++;
+    return header;
 }

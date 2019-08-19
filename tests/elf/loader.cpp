@@ -17,6 +17,9 @@ TEST_GROUP(TestELF)
 TEST(TestELF, TestLoadHeader)
 {
     uint8_t data[] = {
+        /**
+         * ELFヘッダ
+         */
         // ident
         0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
         // type
@@ -28,7 +31,7 @@ TEST(TestELF, TestLoadHeader)
         // entry
         0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
         // phoff
-        0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
+        0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         // shoff
         0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0xBB,
         // flags
@@ -36,50 +39,69 @@ TEST(TestELF, TestLoadHeader)
         // ensize
         0x21, 0x32,
         // phensize
-        0x43, 0x54,
+        0x40, 0x00,
         // phnum
-        0x65, 0x76,
+        0x01, 0x00,
         // shentsize
         0x87, 0x98,
         // shnum
         0xA9, 0xBA,
         // shstrndx
         0xCB, 0xDC,
+        /**
+         * プログラムヘッダー
+         */
+        // type
+        0x12, 0x34, 0x56, 0x78,
+        // flags
+        0x00, 0x00, 0x00, 0x00,
+        // offset
+        0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88,
+        // v_addr
+        0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF, 0x12,
+        // p_addr
+        0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
+        // size in file
+        0x11, 0xAA, 0x22, 0xBB, 0x33, 0xCC, 0x44, 0xDD,
+        // size in memory
+        0x11, 0xAA, 0x22, 0xBB, 0x33, 0xCC, 0x44, 0xDD,
+        // align
+        0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     };
 
     // テスト対象コール
     ELFLoader::analysis(data);
 
     // 期待値確認
-    CHECK_EQUAL(0x10, ELFLoader::getHeader().ident[0]);
-    CHECK_EQUAL(0x11, ELFLoader::getHeader().ident[1]);
-    CHECK_EQUAL(0x12, ELFLoader::getHeader().ident[2]);
-    CHECK_EQUAL(0x13, ELFLoader::getHeader().ident[3]);
-    CHECK_EQUAL(0x14, ELFLoader::getHeader().ident[4]);
-    CHECK_EQUAL(0x15, ELFLoader::getHeader().ident[5]);
-    CHECK_EQUAL(0x16, ELFLoader::getHeader().ident[6]);
-    CHECK_EQUAL(0x17, ELFLoader::getHeader().ident[7]);
-    CHECK_EQUAL(0x18, ELFLoader::getHeader().ident[8]);
-    CHECK_EQUAL(0x19, ELFLoader::getHeader().ident[9]);
-    CHECK_EQUAL(0x1A, ELFLoader::getHeader().ident[10]);
-    CHECK_EQUAL(0x1B, ELFLoader::getHeader().ident[11]);
-    CHECK_EQUAL(0x1C, ELFLoader::getHeader().ident[12]);
-    CHECK_EQUAL(0x1D, ELFLoader::getHeader().ident[13]);
-    CHECK_EQUAL(0x1E, ELFLoader::getHeader().ident[14]);
-    CHECK_EQUAL(0x1F, ELFLoader::getHeader().ident[15]);
-    CHECK_EQUAL(0xBBAA, ELFLoader::getHeader().type);
-    CHECK_EQUAL(0xCCBB, ELFLoader::getHeader().machine);
-    CHECK_EQUAL(0x66778899, ELFLoader::getHeader().version);
-    CHECK_EQUAL(0x8877665544332211, ELFLoader::getHeader().entry);
-    CHECK_EQUAL(0xAAAAAAAAAAAAAAAA, ELFLoader::getHeader().phoff);
-    CHECK_EQUAL(0xBBBBBBBBBBBBBBBB, ELFLoader::getHeader().shoff);
-    CHECK_EQUAL(0xFFFFFFFF, ELFLoader::getHeader().flags);
-    CHECK_EQUAL(0x3221, ELFLoader::getHeader().ehsize);
-    CHECK_EQUAL(0x5443, ELFLoader::getHeader().phentsize);
-    CHECK_EQUAL(0x7665, ELFLoader::getHeader().phnum);
-    CHECK_EQUAL(0x9887, ELFLoader::getHeader().shentsize);
-    CHECK_EQUAL(0xBAA9, ELFLoader::getHeader().shnum);
-    CHECK_EQUAL(0xDCCB, ELFLoader::getHeader().shstrndx);
+    CHECK_EQUAL(0x10, ELFLoader::getELF().header.ident[0]);
+    CHECK_EQUAL(0x11, ELFLoader::getELF().header.ident[1]);
+    CHECK_EQUAL(0x12, ELFLoader::getELF().header.ident[2]);
+    CHECK_EQUAL(0x13, ELFLoader::getELF().header.ident[3]);
+    CHECK_EQUAL(0x14, ELFLoader::getELF().header.ident[4]);
+    CHECK_EQUAL(0x15, ELFLoader::getELF().header.ident[5]);
+    CHECK_EQUAL(0x16, ELFLoader::getELF().header.ident[6]);
+    CHECK_EQUAL(0x17, ELFLoader::getELF().header.ident[7]);
+    CHECK_EQUAL(0x18, ELFLoader::getELF().header.ident[8]);
+    CHECK_EQUAL(0x19, ELFLoader::getELF().header.ident[9]);
+    CHECK_EQUAL(0x1A, ELFLoader::getELF().header.ident[10]);
+    CHECK_EQUAL(0x1B, ELFLoader::getELF().header.ident[11]);
+    CHECK_EQUAL(0x1C, ELFLoader::getELF().header.ident[12]);
+    CHECK_EQUAL(0x1D, ELFLoader::getELF().header.ident[13]);
+    CHECK_EQUAL(0x1E, ELFLoader::getELF().header.ident[14]);
+    CHECK_EQUAL(0x1F, ELFLoader::getELF().header.ident[15]);
+    CHECK_EQUAL(0xBBAA, ELFLoader::getELF().header.type);
+    CHECK_EQUAL(0xCCBB, ELFLoader::getELF().header.machine);
+    CHECK_EQUAL(0x66778899, ELFLoader::getELF().header.version);
+    CHECK_EQUAL(0x8877665544332211, ELFLoader::getELF().header.entry);
+    CHECK_EQUAL(0x0000000000000040, ELFLoader::getELF().header.phoff);
+    CHECK_EQUAL(0xBBBBBBBBBBBBBBBB, ELFLoader::getELF().header.shoff);
+    CHECK_EQUAL(0xFFFFFFFF, ELFLoader::getELF().header.flags);
+    CHECK_EQUAL(0x3221, ELFLoader::getELF().header.ehsize);
+    CHECK_EQUAL(0x0040, ELFLoader::getELF().header.phentsize);
+    CHECK_EQUAL(0x0001, ELFLoader::getELF().header.phnum);
+    CHECK_EQUAL(0x9887, ELFLoader::getELF().header.shentsize);
+    CHECK_EQUAL(0xBAA9, ELFLoader::getELF().header.shnum);
+    CHECK_EQUAL(0xDCCB, ELFLoader::getELF().header.shstrndx);
 }
 
 /**
@@ -109,35 +131,36 @@ TEST(TestELF, TestLoadHeaderFromSampleFile)
     ELFLoader::analysis(data);
 
     // 期待値確認
-    CHECK_EQUAL(0x7F, ELFLoader::getHeader().ident[0]);
-    CHECK_EQUAL(0x45, ELFLoader::getHeader().ident[1]);
-    CHECK_EQUAL(0x4c, ELFLoader::getHeader().ident[2]);
-    CHECK_EQUAL(0x46, ELFLoader::getHeader().ident[3]);
-    CHECK_EQUAL(0x02, ELFLoader::getHeader().ident[4]);
-    CHECK_EQUAL(0x01, ELFLoader::getHeader().ident[5]);
-    CHECK_EQUAL(0x01, ELFLoader::getHeader().ident[6]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[7]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[8]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[9]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[10]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[11]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[12]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[13]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[14]);
-    CHECK_EQUAL(0x00, ELFLoader::getHeader().ident[15]);
-    CHECK_EQUAL(0x0003, ELFLoader::getHeader().type);
-    CHECK_EQUAL(0x003e, ELFLoader::getHeader().machine);
-    CHECK_EQUAL(0x00000001, ELFLoader::getHeader().version);
-    CHECK_EQUAL(0x0000000000001020, ELFLoader::getHeader().entry);
-    CHECK_EQUAL(0x0000000000000040, ELFLoader::getHeader().phoff);
-    CHECK_EQUAL(0x00000000000038E8, ELFLoader::getHeader().shoff);
-    CHECK_EQUAL(0x00000000, ELFLoader::getHeader().flags);
-    CHECK_EQUAL(0x0040, ELFLoader::getHeader().ehsize);
-    CHECK_EQUAL(0x0038, ELFLoader::getHeader().phentsize);
-    CHECK_EQUAL(0x000B, ELFLoader::getHeader().phnum);
-    CHECK_EQUAL(0x0040, ELFLoader::getHeader().shentsize);
-    CHECK_EQUAL(0x001B, ELFLoader::getHeader().shnum);
-    CHECK_EQUAL(0x001A, ELFLoader::getHeader().shstrndx);
+    CHECK_EQUAL(0x7F, ELFLoader::getELF().header.ident[0]);
+    CHECK_EQUAL(0x45, ELFLoader::getELF().header.ident[1]);
+    CHECK_EQUAL(0x4c, ELFLoader::getELF().header.ident[2]);
+    CHECK_EQUAL(0x46, ELFLoader::getELF().header.ident[3]);
+    CHECK_EQUAL(0x02, ELFLoader::getELF().header.ident[4]);
+    CHECK_EQUAL(0x01, ELFLoader::getELF().header.ident[5]);
+    CHECK_EQUAL(0x01, ELFLoader::getELF().header.ident[6]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[7]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[8]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[9]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[10]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[11]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[12]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[13]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[14]);
+    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[15]);
+    CHECK_EQUAL(0x0003, ELFLoader::getELF().header.type);
+    CHECK_EQUAL(0x003e, ELFLoader::getELF().header.machine);
+    CHECK_EQUAL(0x00000001, ELFLoader::getELF().header.version);
+    CHECK_EQUAL(0x0000000000001020, ELFLoader::getELF().header.entry);
+    CHECK_EQUAL(0x0000000000000040, ELFLoader::getELF().header.phoff);
+    CHECK_EQUAL(0x00000000000038E8, ELFLoader::getELF().header.shoff);
+    CHECK_EQUAL(0x00000000, ELFLoader::getELF().header.flags);
+    CHECK_EQUAL(0x0040, ELFLoader::getELF().header.ehsize);
+    CHECK_EQUAL(0x0038, ELFLoader::getELF().header.phentsize);
+    CHECK_EQUAL(0x000B, ELFLoader::getELF().header.phnum);
+    CHECK_EQUAL(0x0040, ELFLoader::getELF().header.shentsize);
+    CHECK_EQUAL(0x001B, ELFLoader::getELF().header.shnum);
+    CHECK_EQUAL(0x001A, ELFLoader::getELF().header.shstrndx);
+    CHECK_EQUAL(0x001A, ELFLoader::getELF().header.shstrndx);
 
     delete[] data;
 }
