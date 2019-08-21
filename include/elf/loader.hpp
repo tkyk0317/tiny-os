@@ -50,12 +50,29 @@ typedef struct {
 } ELF64Data;
 
 /**
+ * ELFプログラムヘッダーローダークラス
+ */
+class ELFLoaderProgHeader {
+public:
+    // プログラムヘッダーロード
+    static ELF64ProgHeader load(const uint8_t*);
+
+private:
+    ELFLoaderProgHeader() = delete;
+    ~ELFLoaderProgHeader() = delete;
+    ELFLoaderProgHeader(const ELFLoaderProgHeader&) = delete;
+    ELFLoaderProgHeader(const ELFLoaderProgHeader&&) = delete;
+    ELFLoaderProgHeader& operator=(const ELFLoaderProgHeader&) = delete;
+    ELFLoaderProgHeader& operator=(const ELFLoaderProgHeader&&) = delete;
+};
+
+/**
  * ELFファイルローダークラス
  */
 class ELFLoader {
 public:
-    // ELFデータ解析
-    static void analysis(const uint8_t*);
+    // ELFデータロード
+    static void load(const uint8_t*);
     // ELFデータ取得
     static ELF64Data& getELF() { return ELFLoader::elf; }
 

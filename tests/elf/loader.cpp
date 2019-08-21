@@ -10,6 +10,12 @@ TEST_GROUP(TestELF)
     TEST_TEARDOWN() {}
 };
 
+TEST_GROUP(TestELFProgHeader)
+{
+    TEST_SETUP() {}
+    TEST_TEARDOWN() {}
+};
+
 /**
  * 概要：ダミーのELFデータをロード
  * 期待値：すべてのヘッダーが適切にロードできていること
@@ -70,7 +76,7 @@ TEST(TestELF, TestLoadHeader)
     };
 
     // テスト対象コール
-    ELFLoader::analysis(data);
+    ELFLoader::load(data);
 
     // 期待値確認
     CHECK_EQUAL(0x10, ELFLoader::getELF().header.ident[0]);
@@ -128,7 +134,7 @@ TEST(TestELF, TestLoadHeaderFromSampleFile)
     fin.read(reinterpret_cast<char*>(data), size);
 
     // テスト対象コール
-    ELFLoader::analysis(data);
+    ELFLoader::load(data);
 
     // 期待値確認
     CHECK_EQUAL(0x7F, ELFLoader::getELF().header.ident[0]);
@@ -163,6 +169,48 @@ TEST(TestELF, TestLoadHeaderFromSampleFile)
     CHECK_EQUAL(0x001A, ELFLoader::getELF().header.shstrndx);
 
     delete[] data;
+}
+
+/**
+ * 概要：ダミーのELFデータをロード
+ * 期待値：すべてのヘッダーが適切にロードできていること
+ */
+TEST(TestELFProgHeader, TestLoadHeader)
+{
+    uint8_t data[] = {
+        /**
+         * ELFプログラムヘッダー
+         */
+        // type
+        0x12, 0x34, 0x56, 0x78,
+        // flags
+        0x00, 0x00, 0x00, 0x00,
+        // offset
+        0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88,
+        // v_addr
+        0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF, 0x12,
+        // p_addr
+        0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
+        // size in file
+        0x11, 0xAA, 0x22, 0xBB, 0x33, 0xCC, 0x44, 0xDD,
+        // size in memory
+        0xAA, 0x11, 0xBB, 0x22, 0xCC, 0x33, 0xDD, 0x44,
+        // align
+        0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+
+    // テスト対象コール
+    ELF64ProgHeader h = ELFLoaderProgHeader::load(data);
+
+    // 期待値確認
+    CHECK_EQUAL(0x78563412, h.type);
+    CHECK_EQUAL(0x00000000, h.flags);
+    CHECK_EQUAL(0x8899AABBCCDDEEFF, h.offset);
+    CHECK_EQUAL(0x12EFCDAB90785634, h.v_addr);
+    CHECK_EQUAL(0xF0E0D0C0B0A09080, h.p_addr);
+    CHECK_EQUAL(0xDD44CC33BB22AA11, h.size_in_file);
+    CHECK_EQUAL(0x44DD33CC22BB11AA, h.size_in_mem);
+    CHECK_EQUAL(0x0000000000000008, h.align);
 }
 
 /**

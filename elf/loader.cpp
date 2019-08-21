@@ -12,14 +12,14 @@ ELF64Data ELFLoader::elf;
 /**
  * ELFデータ解析
  */
-void ELFLoader::analysis(const uint8_t* data)
+void ELFLoader::load(const uint8_t* data)
 {
     // ヘッダロード
     ELFLoader::loadELFHeader(data);
 
     // プログラムヘッダテーブルから各セグメントを読む
     for (uint64_t i = 0; i < ELFLoader::elf.header.phnum; i++) {
-        ELF64ProgHeader h = ELFLoader::loadProgHeader(
+        ELF64ProgHeader h = ELFLoaderProgHeader::load(
             data + ELFLoader::elf.header.phoff + i * ELFLoader::elf.header.phentsize
         );
         // メモリへ展開
@@ -93,14 +93,15 @@ void ELFLoader::loadELFHeader(const uint8_t* data)
 /**
  * プログラムヘッダーロード
  */
-ELF64ProgHeader ELFLoader::loadProgHeader(const uint8_t* data)
+ELF64ProgHeader ELFLoaderProgHeader::load(const uint8_t* data)
 {
     ELF64ProgHeader header;
-    uint64_t* prog_h = reinterpret_cast<uint64_t*>(const_cast<uint8_t*>(data));
+    uint32_t* prog_h32 = reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(data));
 
     // 各パラメータ読み込み
-    header.type = *prog_h++;
-    header.flags = *prog_h++;
+    header.type = *prog_h32++;
+    header.flags = *prog_h32++;
+    uint64_t* prog_h = reinterpret_cast<uint64_t*>(prog_h32);
     header.offset = *prog_h++;
     header.v_addr = *prog_h++;
     header.p_addr = *prog_h++;
