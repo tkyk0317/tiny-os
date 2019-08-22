@@ -13,12 +13,12 @@
 #include "memory.hpp"
 #include "devices/uart/uart.hpp"
 
-// スタック開始位置
-uint8_t* MemoryManager::start_page = reinterpret_cast<uint8_t*>(0x3A000000);
-
 // ページテーブル
 TABLE_DESCRIPTOR MemoryManager::l1_ptb[MemoryManager::ENTRY_SIZE] = {0};
 BLOCK_DESCRIPTOR MemoryManager::l2_ptb[MemoryManager::ENTRY_SIZE << 1] = {0};
+
+// メモリマップ
+bool MemoryManager::memory_map[MemoryManager::MEMORY_MAP_SIZE] = {false};
 
 /**
  * メモリアボート
@@ -152,7 +152,16 @@ void MemoryManager::create_el0_table()
  */
 uint64_t* MemoryManager::get_page()
 {
-    uint64_t* p = reinterpret_cast<uint64_t*>(MemoryManager::start_page);
-    MemoryManager::start_page -= MemoryManager::PAGE_SIZE;
+    // 未使用領域のメモリを渡す(0x3700_0000から下位アドレスに向けて使用する)
+    uint64_t* p = 0;
+    for (uint64_t i = MEMORY_MAP_SIZE - 1; i > 0; i++) {
+        if (false == MemoryManager::memory_map[i]) {
+            uint64_t addr = (i + 1) * PAGE_SIZE;
+            p = reinterpret_cast<uint64_t*>(addr);
+            MemoryManager::memory_map[i] = true;
+            break;
+        }
+    }
     return p;
 }
+
