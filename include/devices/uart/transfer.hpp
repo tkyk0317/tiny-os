@@ -16,6 +16,8 @@ public:
     static bool load();
     // バッファダンプ
     static void dump();
+    // 受信データ取得
+    static const uint8_t* getData() { return buf; }
 
 private:
     // ready処理
@@ -28,7 +30,7 @@ private:
     static bool receive();
 
     // 転送データバッファ
-    static const uint64_t BUFF_SIZE = 10 * 1024; // 10K
+    static const uint64_t BUFF_SIZE = 1024 * 1024; // 1MB
     static uint64_t index;
     static uint8_t buf[BUFF_SIZE];
 

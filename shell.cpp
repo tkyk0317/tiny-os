@@ -4,6 +4,7 @@
 #include "lib/str.h"
 #include "shell.hpp"
 #include "fork.hpp"
+#include "elf/loader.hpp"
 #include "devices/uart/uart.hpp"
 #include "devices/uart/transfer.hpp"
 
@@ -58,6 +59,8 @@ void Shell::receive(uint32_t c)
         // ダミータスク実行コマンド
         else if (0 == strncmp("dummy", Shell::buf, 5)) Shell::command_dummy();
         // XMODEMファイル転送
+        else if (0 == strncmp("xmodem", Shell::buf, 6)) Shell::command_xmodem();
+        // ファイルロード
         else if (0 == strncmp("load", Shell::buf, 4)) Shell::command_load();
         // XMODEM転送データダンプ
         else if (0 == strncmp("dump", Shell::buf, 4)) Shell::command_dump();
@@ -104,27 +107,40 @@ void Shell::command_help()
     UART::send("  dummy: start dummy user task\n");
     UART::send("  dump:  dump received data by load command\n");
     UART::send("  help:  command help\n");
-    UART::send("  load:  send file with XMODEM (MaxSize=10K)\n");
+    UART::send("  xmodem:  send file with XMODEM (MaxSize=1M)\n");
+    UART::send("  load:  load execute file received by xmodem\n");
     UART::send("  quit:  end tiny-os\n");
     UART::send("-----------------------------\n");
 }
 
 /**
- * loadコマンド
+ * xmodemコマンド
  *
  * ファイル転送中に他のデータを受信すると（ターミナルからの入力等）
  * XMODEMでのデータ受信がおかしくなるので、UARTの受信割り込みを無効化
  */
-void Shell::command_load()
+void Shell::command_xmodem()
 {
     // UART受信割り込みを無効化
     UART::disableInt();
 
-    UART::send("\nstart loading... \n");
+    // xmodem通信開始
+    UART::send("\nwaitting file ...\n");
     UARTTransfer::load();
 
     // UART受信割り込みを有効化
     UART::enableInt();
+}
+
+/**
+ * loadコマンド
+ *
+ * XMODEMで転送したデータをロードする
+ */
+void Shell::command_load()
+{
+    // 受信データをロード
+    ELFLoader::load(UARTTransfer::getData());
 }
 
 /**

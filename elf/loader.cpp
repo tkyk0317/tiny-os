@@ -3,7 +3,9 @@
  *
  * http://caspar.hazymoon.jp/OpenBSD/annex/elf.html
  * http://softwaretechnique.jp/OS_Development/Tips/ELF/elf01.html
+ * https://linuxjm.osdn.jp/html/LDP_man-pages/man5/elf.5.html
  */
+#include "fork.hpp"
 #include "elf/loader.hpp"
 
 // ELF構造体
@@ -22,9 +24,19 @@ void ELFLoader::load(const uint8_t* data)
         ELF64ProgHeader h = ELFLoaderProgHeader::load(
             data + ELFLoader::elf.header.phoff + i * ELFLoader::elf.header.phentsize
         );
-        // メモリへ展開
-        // ToDo
+        // PT_LOAD以外はロード対象外
+        if (h.type != PT_LOAD) continue;
+
+        // メモリへロード
+        uint8_t* section = const_cast<uint8_t*>(data) + h.offset;
+        uint8_t* v_addr = reinterpret_cast<uint8_t*>(h.v_addr);
+        for (uint64_t j = 0; j < h.size_in_file; j++) {
+            *(v_addr + j) = *(section + j);
+        }
     }
+
+    // エントリーポイントからfork
+    Process::fork(reinterpret_cast<TASK_ENTRY>(ELFLoader::elf.header.entry), 0);
 }
 
 /**

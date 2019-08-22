@@ -59,6 +59,7 @@ target_link_libraries(
     system_timer
     interrupts
     sys_call
+    elf_loader
 )
 
 # set linker script

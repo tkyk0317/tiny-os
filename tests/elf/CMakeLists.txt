@@ -10,6 +10,12 @@ add_executable(
     ${CMAKE_SOURCE_DIR}/elf/loader.cpp
 )
 
+target_compile_options(
+    elf-test
+    PRIVATE
+    "-D__TEST__"
+)
+
 target_link_libraries(
     elf-test
     CppUTest

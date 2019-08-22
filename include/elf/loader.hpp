@@ -3,6 +3,19 @@
 #include <cstdint>
 
 /**
+ * プログラムヘッダー定数
+ */
+enum PTYPE {
+    PT_NULL = 0, // 未使用セグメント
+    PT_LOAD, // ロード可能セグメント
+    PT_DYNAMIC, // 動的リンク情報セグメント
+    PT_INTERP, // インタープリターとして起動されるパス名 (ヌル文字終端) の位置とサイズを指定
+    PT_NOTE, // 補足情報 (auxiliary information) の位置とサイズ
+    PT_SHLIB, // 予約領域
+    PT_PHDR, // ファイルおよびプログラムのメモリーイメージ双方における プログラムヘッダーテーブル自身の位置とサイズ
+};
+
+/**
  * ELFヘッダー構造体
  */
 typedef struct {

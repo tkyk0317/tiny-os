@@ -9,7 +9,6 @@
  */
 extern "C" void show_registers()
 {
-#if 0
     UART::send("\n===============================================\n");
     UART::send("Register Information\n");
     uint64_t reg;
@@ -31,5 +30,4 @@ extern "C" void show_registers()
 
     Scheduler::show_taskinfo();
     UART::send("===============================================\n");
-#endif
 }

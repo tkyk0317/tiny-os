@@ -23,6 +23,8 @@ private:
     static void command_dummy();
     // helpコマンド
     static void command_help();
+    // xmodemコマンド
+    static void command_xmodem();
     // loadコマンド
     static void command_load();
     // dumpコマンド

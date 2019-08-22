@@ -1,8 +1,15 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include "elf/loader.hpp"
+#include "fork.hpp"
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+
+/**
+ * Mock用クラス
+ */
+bool Process::fork(TASK_ENTRY, void*) { return true; }
+void Process::entry(TASK_ENTRY, void*) {}
 
 TEST_GROUP(TestELF)
 {
@@ -108,67 +115,6 @@ TEST(TestELF, TestLoadHeader)
     CHECK_EQUAL(0x9887, ELFLoader::getELF().header.shentsize);
     CHECK_EQUAL(0xBAA9, ELFLoader::getELF().header.shnum);
     CHECK_EQUAL(0xDCCB, ELFLoader::getELF().header.shstrndx);
-}
-
-/**
- * 概要：サンプルELFファイルをロード
- * 期待値：適切にELFヘッダーがロードできていること
- */
-TEST(TestELF, TestLoadHeaderFromSampleFile)
-{
-    // サンプルデータをすべて読み込む
-    std::ifstream fin("../../../tests/elf/sample.elf", std::ios::in | std::ios::binary );
-    if (!fin) {
-        std::cout << "cannot open file" << std::endl;
-        return;
-    }
-
-    auto begin = static_cast<int>(fin.tellg());
-    fin.seekg(0, fin.end);
-    auto end = static_cast<int>(fin.tellg());
-    auto size = end - begin;
-    fin.clear();
-    fin.seekg(0, fin.beg);
-    uint8_t* data = new uint8_t[size + 1];
-    data[size] = 0;
-    fin.read(reinterpret_cast<char*>(data), size);
-
-    // テスト対象コール
-    ELFLoader::load(data);
-
-    // 期待値確認
-    CHECK_EQUAL(0x7F, ELFLoader::getELF().header.ident[0]);
-    CHECK_EQUAL(0x45, ELFLoader::getELF().header.ident[1]);
-    CHECK_EQUAL(0x4c, ELFLoader::getELF().header.ident[2]);
-    CHECK_EQUAL(0x46, ELFLoader::getELF().header.ident[3]);
-    CHECK_EQUAL(0x02, ELFLoader::getELF().header.ident[4]);
-    CHECK_EQUAL(0x01, ELFLoader::getELF().header.ident[5]);
-    CHECK_EQUAL(0x01, ELFLoader::getELF().header.ident[6]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[7]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[8]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[9]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[10]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[11]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[12]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[13]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[14]);
-    CHECK_EQUAL(0x00, ELFLoader::getELF().header.ident[15]);
-    CHECK_EQUAL(0x0003, ELFLoader::getELF().header.type);
-    CHECK_EQUAL(0x003e, ELFLoader::getELF().header.machine);
-    CHECK_EQUAL(0x00000001, ELFLoader::getELF().header.version);
-    CHECK_EQUAL(0x0000000000001020, ELFLoader::getELF().header.entry);
-    CHECK_EQUAL(0x0000000000000040, ELFLoader::getELF().header.phoff);
-    CHECK_EQUAL(0x00000000000038E8, ELFLoader::getELF().header.shoff);
-    CHECK_EQUAL(0x00000000, ELFLoader::getELF().header.flags);
-    CHECK_EQUAL(0x0040, ELFLoader::getELF().header.ehsize);
-    CHECK_EQUAL(0x0038, ELFLoader::getELF().header.phentsize);
-    CHECK_EQUAL(0x000B, ELFLoader::getELF().header.phnum);
-    CHECK_EQUAL(0x0040, ELFLoader::getELF().header.shentsize);
-    CHECK_EQUAL(0x001B, ELFLoader::getELF().header.shnum);
-    CHECK_EQUAL(0x001A, ELFLoader::getELF().header.shstrndx);
-    CHECK_EQUAL(0x001A, ELFLoader::getELF().header.shstrndx);
-
-    delete[] data;
 }
 
 /**
