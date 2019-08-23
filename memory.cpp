@@ -11,11 +11,8 @@
  * https://github.com/bztsrc/raspi3-tutorial/tree/master/10_virtualmemory
  */
 #include "memory.hpp"
+#include "scheduler.hpp"
 #include "devices/uart/uart.hpp"
-
-// ページテーブル
-TABLE_DESCRIPTOR MemoryManager::l1_ptb[MemoryManager::ENTRY_SIZE] = {0};
-BLOCK_DESCRIPTOR MemoryManager::l2_ptb[MemoryManager::ENTRY_SIZE << 1] = {0};
 
 // メモリマップ
 bool MemoryManager::memory_map[MemoryManager::MEMORY_MAP_SIZE] = {false};
@@ -37,14 +34,15 @@ uint64_t MemoryManager::abort(uint64_t far)
     // DataAbortを検知した段階で、APを1へ書き換える（書き換えないとEL0タスクが動作しない）
     // AP=Data Access Permission(EL0: 0=None、1=Write/Read)
     // ※12(Addressフィールド位置)+9bit(2MBセクションにする為のシフト値)=21bitsシフトした数値がインデックス
-    MemoryManager::l2_ptb[far >> 21].AP = APBITS_NO_LIMIT;
+    BLOCK_DESCRIPTOR* blk = Scheduler::current_task()->l2_ptb;
+    blk[far >> 21].AP = APBITS_NO_LIMIT;
     return 0;
 }
 
 /**
  * 初期化処理
  */
-void MemoryManager::init()
+void MemoryManager::init(TABLE_DESCRIPTOR* tbl)
 {
     // キャッシュポリシー
     uint64_t cp =
@@ -84,14 +82,11 @@ void MemoryManager::init()
         (1<<1)  |   // A, Alignment check enable bit
         (1<<0);     // set M, enable MMU
 
-    // テーブル作成
-    MemoryManager::create_el0_table();
-
     // 各種レジスタ設定
     asm volatile("dsb sy");
     asm volatile("msr mair_el1, %0; isb" :: "r" (cp));
     asm volatile("msr tcr_el1, %0; isb" :: "r" (tcr));
-    asm volatile("msr ttbr0_el1, %0; isb" :: "r" (reinterpret_cast<uint64_t>(&MemoryManager::l1_ptb[0])));
+    asm volatile("msr ttbr0_el1, %0; isb" :: "r" (reinterpret_cast<uint64_t>(&tbl[0])));
     asm volatile("msr sctlr_el1, %0; isb" :: "r" (sctlr));
 }
 
@@ -101,50 +96,50 @@ void MemoryManager::init()
  * 2段のテーブル構成で、一段目で1GB、二段目で2MBの範囲をカバー
  * L1テーブルへ設定するL2テーブルのアドレスは、12bits右シフトしたものを設定しないと動作しない（QEMU4.0.0で確認）
  */
-void MemoryManager::create_el0_table()
+void MemoryManager::create_el0_table(TABLE_DESCRIPTOR* tbl, BLOCK_DESCRIPTOR* blk)
 {
     // RAM領域880MB
     for (uint64_t i = 0; i < 440; i++) {
-        MemoryManager::l2_ptb[i].Address = i << BLOCK_SHIFT;
-        MemoryManager::l2_ptb[i].AF = AFBITS_ACCESS;
-        MemoryManager::l2_ptb[i].SH = SH_INNER_SHAREABLE;
-        MemoryManager::l2_ptb[i].AP = APBITS_NO_EL0; // エントリー登録時はAP=0で登録（MMUを有効にした時点でハングする）
-        MemoryManager::l2_ptb[i].NS = NSBITS_NON_SECURE;
-        MemoryManager::l2_ptb[i].MemAttr = MEMATTR_INDEX_BITS_NORMAL;
-        MemoryManager::l2_ptb[i].EntryType = DESCRIPTOR_BLOCK;
+        blk[i].Address = i << BLOCK_SHIFT;
+        blk[i].AF = AFBITS_ACCESS;
+        blk[i].SH = SH_INNER_SHAREABLE;
+        blk[i].AP = APBITS_NO_EL0; // エントリー登録時はAP=0で登録（MMUを有効にした時点でハングする）
+        blk[i].NS = NSBITS_NON_SECURE;
+        blk[i].MemAttr = MEMATTR_INDEX_BITS_NORMAL;
+        blk[i].EntryType = DESCRIPTOR_BLOCK;
     }
     // GPU領域128MB
     for (uint64_t i = 440; i < 504; i++) {
-        MemoryManager::l2_ptb[i].Address = i << BLOCK_SHIFT;
-        MemoryManager::l2_ptb[i].AF = AFBITS_ACCESS;
-        MemoryManager::l2_ptb[i].AP = APBITS_NO_LIMIT;
-        MemoryManager::l2_ptb[i].NS = NSBITS_NON_SECURE;
-        MemoryManager::l2_ptb[i].MemAttr = MEMATTR_INDEX_BITS_DEVICE_GRE;
-        MemoryManager::l2_ptb[i].EntryType = DESCRIPTOR_BLOCK;
+        blk[i].Address = i << BLOCK_SHIFT;
+        blk[i].AF = AFBITS_ACCESS;
+        blk[i].AP = APBITS_NO_LIMIT;
+        blk[i].NS = NSBITS_NON_SECURE;
+        blk[i].MemAttr = MEMATTR_INDEX_BITS_DEVICE_GRE;
+        blk[i].EntryType = DESCRIPTOR_BLOCK;
     }
     // ペリフェラル領域
     for (uint64_t i = 504; i < 512; i++) {
-        MemoryManager::l2_ptb[i].Address = i << BLOCK_SHIFT;
-        MemoryManager::l2_ptb[i].AF = AFBITS_ACCESS;
-        MemoryManager::l2_ptb[i].AP = APBITS_NO_LIMIT;
-        MemoryManager::l2_ptb[i].NS = NSBITS_NON_SECURE;
-        MemoryManager::l2_ptb[i].MemAttr = MEMATTR_INDEX_BITS_DEVICE_NGNRNE;
-        MemoryManager::l2_ptb[i].EntryType = DESCRIPTOR_BLOCK;
+        blk[i].Address = i << BLOCK_SHIFT;
+        blk[i].AF = AFBITS_ACCESS;
+        blk[i].AP = APBITS_NO_LIMIT;
+        blk[i].NS = NSBITS_NON_SECURE;
+        blk[i].MemAttr = MEMATTR_INDEX_BITS_DEVICE_NGNRNE;
+        blk[i].EntryType = DESCRIPTOR_BLOCK;
     }
     // mailbox領域
-    MemoryManager::l2_ptb[512].Address = 512LL << BLOCK_SHIFT;
-    MemoryManager::l2_ptb[512].AF = AFBITS_ACCESS;
-    MemoryManager::l2_ptb[512].AP = APBITS_NO_LIMIT;
-    MemoryManager::l2_ptb[512].NS = NSBITS_NON_SECURE;
-    MemoryManager::l2_ptb[512].EntryType = DESCRIPTOR_BLOCK;
+    blk[512].Address = 512LL << BLOCK_SHIFT;
+    blk[512].AF = AFBITS_ACCESS;
+    blk[512].AP = APBITS_NO_LIMIT;
+    blk[512].NS = NSBITS_NON_SECURE;
+    blk[512].EntryType = DESCRIPTOR_BLOCK;
 
     // L1テーブルへエントリー
-    MemoryManager::l1_ptb[0].NSTable = 1;
-    MemoryManager::l1_ptb[0].Address = reinterpret_cast<uint64_t>(&MemoryManager::l2_ptb[0]) >> 12; // 12bitsシフトしないと動作しない
-    MemoryManager::l1_ptb[0].EntryType = DESCRIPTOR_PAGE;
-    MemoryManager::l1_ptb[1].NSTable = 1;
-    MemoryManager::l1_ptb[1].Address = reinterpret_cast<uint64_t>(&MemoryManager::l2_ptb[512]) >> 12; // 12bitsシフトしないと動作しない
-    MemoryManager::l1_ptb[1].EntryType = DESCRIPTOR_PAGE;
+    tbl[0].NSTable = 1;
+    tbl[0].Address = reinterpret_cast<uint64_t>(&blk[0]) >> 12; // 12bitsシフトしないと動作しない
+    tbl[0].EntryType = DESCRIPTOR_PAGE;
+    tbl[1].NSTable = 1;
+    tbl[1].Address = reinterpret_cast<uint64_t>(&blk[512]) >> 12; // 12bitsシフトしないと動作しない
+    tbl[1].EntryType = DESCRIPTOR_PAGE;
 }
 
 /**

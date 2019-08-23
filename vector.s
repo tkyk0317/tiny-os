@@ -180,3 +180,10 @@ __switch_el0:
     mov   x0, x2
     eret
 
+.global __switch_ttbr
+__switch_ttbr:
+    msr ttbr0_el1, x0
+    //tlbi vmalle1is
+    dsb ish
+    isb
+    ret

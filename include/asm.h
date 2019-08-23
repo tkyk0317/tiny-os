@@ -19,3 +19,6 @@ extern "C" void enable_irq();
 
 // 割り込み無効化
 extern "C" void disable_irq();
+
+// TTBR切り替え
+extern "C" void __switch_ttbr(uint64_t);

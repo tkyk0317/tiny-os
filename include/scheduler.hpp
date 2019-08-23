@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "memory.hpp"
 
 // タスク状態
 enum TaskStatus {
@@ -15,6 +16,8 @@ typedef struct _TaskContext {
     uint64_t* base_stack; // スタック開始アドレス
     TaskStatus status; // スレッド起動状態
     uint32_t preempt; // プリエンプトフラグ
+    __attribute__((aligned(MEMORY_ALIGN_SIZE))) TABLE_DESCRIPTOR l1_ptb[MEMORY_ENTRY_SIZE];
+    __attribute__((aligned(MEMORY_ALIGN_SIZE))) BLOCK_DESCRIPTOR l2_ptb[MEMORY_ENTRY_SIZE << 1];
 } TaskContext;
 
 /**
@@ -58,7 +61,6 @@ private:
 
     // タスク切り替え
     static void switch_task();
-
 
     Scheduler() = delete;
     ~Scheduler() = delete;

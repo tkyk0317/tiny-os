@@ -15,11 +15,11 @@ extern "C" void* __gxx_personality_v0() { return 0; }
  */
 void init()
 {
-    // メモリーユニット初期化
-    MemoryManager::init();
-
     // スケジューラー初期化
     Scheduler::init();
+
+    // メモリーユニット初期化
+    MemoryManager::init(Scheduler::current_task()->l1_ptb);
 
     // UART割り込み有効
     MMIO::write(IRQ_ENABLE2, IRQ_ENABLE2_UART);

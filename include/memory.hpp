@@ -2,6 +2,10 @@
 
 #include <cstdint>
 
+// ページテーブル
+const uint64_t MEMORY_ALIGN_SIZE = 4096;
+const uint64_t MEMORY_ENTRY_SIZE = 512;
+
 // ブロックディスクリプタアドレス位置
 const uint64_t BLOCK_SHIFT = 9; // 2MB空間
 
@@ -97,7 +101,7 @@ typedef union {
 class MemoryManager {
 public:
     // 初期化処理
-    static void init();
+    static void init(TABLE_DESCRIPTOR*);
 
     // メモリ取得
     static uint64_t* get_page();
@@ -105,22 +109,15 @@ public:
     // メモリアボート例外
     static uint64_t abort(uint64_t);
 
+    // EL0ページテーブル作成
+    static void create_el0_table(TABLE_DESCRIPTOR*, BLOCK_DESCRIPTOR*);
+
 private:
+    // メモリマップ
     static const uint64_t RAM_SIZE = 1024 * 1024 * 880; // 880MB
     static const uint64_t PAGE_SIZE = 1024 * 1024 * 2; // 2MB
-    static const uint64_t ALIGN_SIZE = 4096;
-    static const uint64_t ENTRY_SIZE = 512;
-
-    // ページテーブル
-    __attribute__((aligned(ALIGN_SIZE))) static TABLE_DESCRIPTOR l1_ptb[ENTRY_SIZE];
-    __attribute__((aligned(ALIGN_SIZE))) static BLOCK_DESCRIPTOR l2_ptb[ENTRY_SIZE << 1];
-
-    // メモリマップ
     static const uint64_t MEMORY_MAP_SIZE = RAM_SIZE / PAGE_SIZE;
     static bool memory_map[MEMORY_MAP_SIZE];
-
-    // EL0ページテーブル作成
-    static void create_el0_table();
 
     MemoryManager() = delete;
     ~MemoryManager() = delete;

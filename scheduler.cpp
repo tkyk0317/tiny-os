@@ -1,4 +1,5 @@
 #include "scheduler.hpp"
+#include "memory.h"
 #include "fork.hpp"
 #include "asm.h"
 #include "devices/uart/uart.hpp"
@@ -19,10 +20,11 @@ void Scheduler::init()
         Scheduler::context[i].next = 0;
         Scheduler::context[i].stack = 0;
         Scheduler::context[i].preempt = 0;
+        MemoryManager::create_el0_table(Scheduler::context[i].l1_ptb, Scheduler::context[i].l2_ptb);
     }
     Scheduler::created_task_nums = 0;
     Scheduler::current = &Scheduler::context[0];
-    Scheduler::current->base_stack = reinterpret_cast<uint64_t*>(0x20000);
+    Scheduler::current->base_stack = MemoryManager::get_page();
 }
 
 /**
@@ -84,6 +86,9 @@ void Scheduler::switch_task()
     Scheduler::current->status = SUSPEND;
     Scheduler::current = Scheduler::current->next;
     Scheduler::current->status = RUNNING;
+
+    // TTBR切り替え
+    __switch_ttbr(reinterpret_cast<uint64_t>(Scheduler::current->l1_ptb));
 
     // コンテキストスイッチ
     __switch(cur, &Scheduler::current->stack);
