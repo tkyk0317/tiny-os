@@ -15,8 +15,8 @@ uint32_t Scheduler::created_task_nums;
 void Scheduler::init()
 {
     for (uint32_t i = 0 ; i < TASK_NUMS ; i++) {
-        Scheduler::context[i].next = 0;
-        Scheduler::context[i].stack = 0;
+        Scheduler::context[i].next = nullptr;
+        Scheduler::context[i].stack = nullptr;
         Scheduler::context[i].preempt = 0;
         MemoryManager::create_el0_table(Scheduler::context[i].l1_ptb, Scheduler::context[i].l2_ptb);
     }
@@ -75,8 +75,8 @@ void Scheduler::schedule()
  */
 void Scheduler::switch_task()
 {
-    if (!Scheduler::current->next) return; // 次のタスクが存在しない
-    if (!Scheduler::current->next->stack) return; // スタック未設定時はスイッチしない
+    if (nullptr == Scheduler::current->next) return; // 次のタスクが存在しない
+    if (nullptr == Scheduler::current->next->stack) return; // スタック未設定時はスイッチしない
     if (Scheduler::current == Scheduler::current->next) return; // 同じタスクへはスイッチしない
 
     // 現在のスレッドから次のスレッドへ切り替える

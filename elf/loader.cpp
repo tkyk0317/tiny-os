@@ -16,6 +16,8 @@ ELF64Data ELFLoader::elf;
  */
 void ELFLoader::load(const uint8_t* data)
 {
+    if (nullptr == data) return;
+
     // ヘッダロード
     ELFLoader::loadELFHeader(data);
 
@@ -36,7 +38,7 @@ void ELFLoader::load(const uint8_t* data)
     }
 
     // エントリーポイントからfork
-    Process::fork(reinterpret_cast<TASK_ENTRY>(ELFLoader::elf.header.entry), 0);
+    Process::fork(reinterpret_cast<TASK_ENTRY>(ELFLoader::elf.header.entry), nullptr);
 }
 
 /**

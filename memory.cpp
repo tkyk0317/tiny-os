@@ -12,7 +12,6 @@
  */
 #include "memory.hpp"
 #include "scheduler.hpp"
-#include "devices/uart/uart.hpp"
 
 // メモリマップ
 bool MemoryManager::memory_map[MemoryManager::MEMORY_MAP_SIZE] = {false};
