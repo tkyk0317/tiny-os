@@ -10,13 +10,13 @@ const uint64_t MEMORY_ENTRY_SIZE = 512;
 const uint64_t BLOCK_SHIFT = 9; // 2MB空間
 
 // Descriptor種別
-enum DESCRIPTOR_BITS {
+enum class DESCRIPTOR_BITS: uint64_t {
     DESCRIPTOR_BLOCK = 1 << 0,
     DESCRIPTOR_PAGE = 3 << 0,
 };
 
 // MemAttrIndexフィールド
-enum MEMATTR_INDEX_BITS {
+enum class MEMATTR_INDEX_BITS: uint64_t {
     MEMATTR_INDEX_BITS_DEVICE_NGNRNE = 0,
     MEMATTR_INDEX_BITS_DEVICE_NGNRE = 1,
     MEMATTR_INDEX_BITS_DEVICE_GRE = 2,
@@ -25,13 +25,13 @@ enum MEMATTR_INDEX_BITS {
 };
 
 // NSフィールド
-enum NSBITS {
+enum class NSBITS: uint64_t {
     NSBITS_NON_SECURE = 1, // non secure
     NSBITS_SECURE = 0,     // secure
 };
 
 // APフィールド
-enum APBITS {
+enum class APBITS: uint64_t {
     APBITS_NO_EL0 = 0,
     APBITS_NO_LIMIT = 1,
     APBITS_NO_WRITE_ELn_NO_EL0 = 2,
@@ -39,19 +39,19 @@ enum APBITS {
 };
 
 // SHフィールド
-enum SHBITS {
+enum class SHBITS: uint64_t {
     SH_OUTER_SHAREABLE = 2, // Outter shareable
     SH_INNER_SHAREABLE = 3, // Inner shareable
 };
 
 // AFフィールド
-enum AFBITS {
+enum class AFBITS: uint64_t {
     AFBITS_ACCESS = 1,    // can access
     AFBITS_NO_ACCESS = 0, // can not access
 };
 
 // APTABLEフィールド
-enum APTABLE_BITS {
+enum class APTABLE_BITS: uint64_t {
     APTABLE_NOEFFECT = 0,          // No effect
     APTABLE_NO_EL0   = 1,          // Access at EL0 not permitted, regardless of permissions in subsequent levels of lookup
     APTABLE_NO_WRITE = 2,          // Write access not permitted, at any Exception level, regardless of permissions in subsequent levels of lookup
@@ -61,7 +61,7 @@ enum APTABLE_BITS {
 // テーブルディスクリプタ
 typedef union {
     struct {
-        uint64_t EntryType: 2;       // @0-1 Always 3 for a page table
+        DESCRIPTOR_BITS EntryType: 2;       // @0-1 Always 3 for a page table
         uint64_t _reserved2_11: 10;  // @2-11 Set to 0
         uint64_t Address: 36;        // @12-47 36 Bits of address
         uint64_t _reserved48_58: 11; // @48-58 Set to 0
@@ -77,12 +77,12 @@ typedef union {
 // ブロックディスクリプタ
 typedef union {
     struct {
-        uint64_t EntryType: 2;      // @0-1 Always 1 for a block table
-        uint64_t MemAttr: 3;        // @2-4
-        uint64_t NS: 1;             // @5
+        DESCRIPTOR_BITS EntryType: 2;      // @0-1 Always 1 for a block table
+        MEMATTR_INDEX_BITS MemAttr: 3;        // @2-4
+        NSBITS NS: 1;             // @5
         APBITS AP: 2;               // @6-7     Data Access permission bits
         SHBITS SH: 2;               // @8-9 Shareability field
-        uint64_t AF: 1;             // @10 Access flag; if 0 an access to this page leads to an TLB Access fault
+        AFBITS AF: 1;             // @10 Access flag; if 0 an access to this page leads to an TLB Access fault
         uint64_t nG: 1;             // @11 not Global bit (ASID management for TLB)
         uint64_t Address: 36;       // @12-47 36 Bits of address
         uint64_t _reserved48_50: 3; // @48-51 Set to 0

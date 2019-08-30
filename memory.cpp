@@ -35,7 +35,7 @@ uint64_t MemoryManager::abort(uint64_t far)
     // AP=Data Access Permission(EL0: 0=None、1=Write/Read)
     // ※12(Addressフィールド位置)+9bit(2MBセクションにする為のシフト値)=21bitsシフトした数値がインデックス
     BLOCK_DESCRIPTOR* blk = Scheduler::current_task()->l2_ptb;
-    blk[far >> 21].AP = APBITS_NO_LIMIT;
+    blk[far >> 21].AP = APBITS::APBITS_NO_LIMIT;
     return 0;
 }
 
@@ -101,45 +101,45 @@ void MemoryManager::create_el0_table(TABLE_DESCRIPTOR* tbl, BLOCK_DESCRIPTOR* bl
     // RAM領域880MB
     for (uint64_t i = 0; i < 440; i++) {
         blk[i].Address = i << BLOCK_SHIFT;
-        blk[i].AF = AFBITS_ACCESS;
-        blk[i].SH = SH_INNER_SHAREABLE;
-        blk[i].AP = APBITS_NO_EL0; // エントリー登録時はAP=0で登録（MMUを有効にした時点でハングする）
-        blk[i].NS = NSBITS_NON_SECURE;
-        blk[i].MemAttr = MEMATTR_INDEX_BITS_NORMAL;
-        blk[i].EntryType = DESCRIPTOR_BLOCK;
+        blk[i].AF = AFBITS::AFBITS_ACCESS;
+        blk[i].SH = SHBITS::SH_INNER_SHAREABLE;
+        blk[i].AP = APBITS::APBITS_NO_EL0; // エントリー登録時はAP=0で登録（MMUを有効にした時点でハングする）
+        blk[i].NS = NSBITS::NSBITS_NON_SECURE;
+        blk[i].MemAttr = MEMATTR_INDEX_BITS::MEMATTR_INDEX_BITS_NORMAL;
+        blk[i].EntryType = DESCRIPTOR_BITS::DESCRIPTOR_BLOCK;
     }
     // GPU領域128MB
     for (uint64_t i = 440; i < 504; i++) {
         blk[i].Address = i << BLOCK_SHIFT;
-        blk[i].AF = AFBITS_ACCESS;
-        blk[i].AP = APBITS_NO_LIMIT;
-        blk[i].NS = NSBITS_NON_SECURE;
-        blk[i].MemAttr = MEMATTR_INDEX_BITS_DEVICE_GRE;
-        blk[i].EntryType = DESCRIPTOR_BLOCK;
+        blk[i].AF = AFBITS::AFBITS_ACCESS;
+        blk[i].AP = APBITS::APBITS_NO_LIMIT;
+        blk[i].NS = NSBITS::NSBITS_NON_SECURE;
+        blk[i].MemAttr = MEMATTR_INDEX_BITS::MEMATTR_INDEX_BITS_DEVICE_GRE;
+        blk[i].EntryType = DESCRIPTOR_BITS::DESCRIPTOR_BLOCK;
     }
     // ペリフェラル領域
     for (uint64_t i = 504; i < 512; i++) {
         blk[i].Address = i << BLOCK_SHIFT;
-        blk[i].AF = AFBITS_ACCESS;
-        blk[i].AP = APBITS_NO_LIMIT;
-        blk[i].NS = NSBITS_NON_SECURE;
-        blk[i].MemAttr = MEMATTR_INDEX_BITS_DEVICE_NGNRNE;
-        blk[i].EntryType = DESCRIPTOR_BLOCK;
+        blk[i].AF = AFBITS::AFBITS_ACCESS;
+        blk[i].AP = APBITS::APBITS_NO_LIMIT;
+        blk[i].NS = NSBITS::NSBITS_NON_SECURE;
+        blk[i].MemAttr = MEMATTR_INDEX_BITS::MEMATTR_INDEX_BITS_DEVICE_NGNRNE;
+        blk[i].EntryType = DESCRIPTOR_BITS::DESCRIPTOR_BLOCK;
     }
     // mailbox領域
     blk[512].Address = 512LL << BLOCK_SHIFT;
-    blk[512].AF = AFBITS_ACCESS;
-    blk[512].AP = APBITS_NO_LIMIT;
-    blk[512].NS = NSBITS_NON_SECURE;
-    blk[512].EntryType = DESCRIPTOR_BLOCK;
+    blk[512].AF = AFBITS::AFBITS_ACCESS;
+    blk[512].AP = APBITS::APBITS_NO_LIMIT;
+    blk[512].NS = NSBITS::NSBITS_NON_SECURE;
+    blk[512].EntryType = DESCRIPTOR_BITS::DESCRIPTOR_BLOCK;
 
     // L1テーブルへエントリー
     tbl[0].NSTable = 1;
     tbl[0].Address = reinterpret_cast<uint64_t>(&blk[0]) >> 12; // 12bitsシフトしないと動作しない
-    tbl[0].EntryType = DESCRIPTOR_PAGE;
+    tbl[0].EntryType = DESCRIPTOR_BITS::DESCRIPTOR_PAGE;
     tbl[1].NSTable = 1;
     tbl[1].Address = reinterpret_cast<uint64_t>(&blk[512]) >> 12; // 12bitsシフトしないと動作しない
-    tbl[1].EntryType = DESCRIPTOR_PAGE;
+    tbl[1].EntryType = DESCRIPTOR_BITS::DESCRIPTOR_PAGE;
 }
 
 /**
