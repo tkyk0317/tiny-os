@@ -9,8 +9,6 @@ TaskContext Scheduler::context[Scheduler::TASK_NUMS];
 TaskContext* Scheduler::current;
 uint32_t Scheduler::created_task_nums;
 
-extern "C" void __preempt_enable() { Scheduler::enable_preempt(); }
-
 /**
  * 初期化処理
  */
