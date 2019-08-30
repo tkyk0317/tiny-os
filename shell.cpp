@@ -139,6 +139,11 @@ void Shell::command_xmodem()
  */
 void Shell::command_load()
 {
+    // データを受信していない場合、SKIP
+    if (UARTTransfer::getSize() <= 0) {
+        UART::send("\nnot receive data\n");
+        return;
+    }
     // 受信データをロード
     ELFLoader::load(UARTTransfer::getData());
 }

@@ -18,6 +18,8 @@ public:
     static void dump();
     // 受信データ取得
     static const uint8_t* getData() { return buf; }
+    // 受信データ長取得
+    static const uint64_t getSize() { return index; }
 
 private:
     // ready処理
