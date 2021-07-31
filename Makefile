@@ -7,8 +7,7 @@ clean:
 	@ rm -rf tiny-os
 
 start: all
-	#@ cd build; qemu-system-aarch64 -cpu cortex-a53 -m 1g -nographic -monitor telnet::1234,server,nowait -M raspi3 -kernel tiny-os -serial mon:stdio
-	@ cd build; qemu-system-aarch64 -cpu cortex-a53 -m 1g -nographic -monitor telnet::1234,server,nowait -M raspi3 -kernel tiny-os -serial pty
+	@ cd build; qemu-system-aarch64 -cpu cortex-a53 -m 1g -nographic -monitor telnet::1234,server,nowait -M raspi3 -kernel tiny-os -serial mon:stdio
 
 stop:
 	@ kill `pgrep qemu`
@@ -46,3 +45,8 @@ docker-stop:
 docker-test:
 	@ docker build . -t tiny-os
 	@ docker run --rm -it tiny-os sh -c "rm -f build/CMakeCache.txt && make test"
+
+.PHONY: docker-telnet
+docker-telnet:
+	@ docker exec -ti tiny-os telnet localhost 1234
+
