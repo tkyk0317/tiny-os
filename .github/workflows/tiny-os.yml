@@ -1,0 +1,16 @@
+name: tiny-os
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: docker build
+      env:
+        DOCKER_BUILDKIT: 1
+      run: docker build . -t tiny-os
+    - name: run test
+      run: docker run --rm tiny-os sh -c "rm -f build/CMakeCache.txt && make test"
