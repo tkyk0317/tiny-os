@@ -35,6 +35,8 @@ uint64_t MemoryManager::abort(uint64_t far)
     // ※12(Addressフィールド位置)+9bit(2MBセクションにする為のシフト値)=21bitsシフトした数値がインデックス
     BLOCK_DESCRIPTOR* blk = Scheduler::current_task()->l2_ptb;
     blk[far >> 21].AP = APBITS::APBITS_NO_LIMIT;
+    MemoryManager::map(far);
+
     return 0;
 }
 
@@ -98,7 +100,7 @@ void MemoryManager::init(TABLE_DESCRIPTOR* tbl)
 void MemoryManager::create_el0_table(TABLE_DESCRIPTOR* tbl, BLOCK_DESCRIPTOR* blk)
 {
     // RAM領域880MB
-    for (uint64_t i = 0; i < 440; i++) {
+    for (uint64_t i = 0; i < 1; i++) {
         blk[i].Address = i << BLOCK_SHIFT;
         blk[i].AF = AFBITS::AFBITS_ACCESS;
         blk[i].SH = SHBITS::SH_INNER_SHAREABLE;
@@ -147,7 +149,7 @@ void MemoryManager::create_el0_table(TABLE_DESCRIPTOR* tbl, BLOCK_DESCRIPTOR* bl
 uint64_t* MemoryManager::get_page()
 {
     // 未使用領域のメモリを渡す(0x3700_0000から下位アドレスに向けて使用する)
-    uint64_t* p = 0;
+    uint64_t* p = nullptr;
     for (uint64_t i = MEMORY_MAP_SIZE - 1; i > 0; i++) {
         if (false == MemoryManager::memory_map[i]) {
             uint64_t addr = (i + 1) * PAGE_SIZE;
@@ -159,3 +161,24 @@ uint64_t* MemoryManager::get_page()
     return p;
 }
 
+/**
+ * メモリマッピング処理
+ *
+ * 論理アドレスを物理アドレスへマッピングする
+ *
+ * @param uint64_t 仮想アドレス
+ */
+void MemoryManager::map(uint64_t v_addr)
+{
+    auto i = v_addr >> 21;
+    auto blk = Scheduler::current_task()->l2_ptb;
+
+    // エントリーを設定する
+    blk[i].Address = i << BLOCK_SHIFT;
+    blk[i].AF = AFBITS::AFBITS_ACCESS;
+    blk[i].SH = SHBITS::SH_INNER_SHAREABLE;
+    blk[i].AP = APBITS::APBITS_NO_LIMIT;
+    blk[i].NS = NSBITS::NSBITS_NON_SECURE;
+    blk[i].MemAttr = MEMATTR_INDEX_BITS::MEMATTR_INDEX_BITS_NORMAL;
+    blk[i].EntryType = DESCRIPTOR_BITS::DESCRIPTOR_BLOCK;
+}

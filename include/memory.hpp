@@ -112,6 +112,8 @@ public:
     // EL0ページテーブル作成
     static void create_el0_table(TABLE_DESCRIPTOR*, BLOCK_DESCRIPTOR*);
 
+    // メモリマッピング
+    static void map(uint64_t);
 private:
     // メモリマップ
     static const uint64_t RAM_SIZE = 1024 * 1024 * 880; // 880MB
